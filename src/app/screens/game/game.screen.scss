@@ -1,0 +1,122 @@
+#game-screen{
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height:100vh;
+  width:100vw;
+
+  .top-row,
+  .bottom-row{
+    display: flex;
+    justify-content: center;
+  }
+
+  .middle-row{
+    display: flex;
+    align-items: center;
+    position:relative;
+
+    .status-dial{
+      position:absolute;
+      bottom:15px;
+      left:200px;
+      height:125px;
+      width:125px;
+      border-radius:75px;
+      border:solid 1px #161616;
+      background-color:#949494;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+
+      .status{
+        cursor:pointer;
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height:100px;
+        width:100px;
+        border-radius:65px;
+        background-color:#161616;
+        opacity:0.8;
+
+        span{
+          text-align: center;
+          width:100px;
+          color:#D5DAD7;
+          font-style:italic;
+          color:#DDDDDD;
+        }
+
+        span:last-child{
+          margin-top:5px;
+          color:#FFFFFF;
+          font-size:1.15em;
+        }
+      }
+
+      .status.active{
+        color:#FFFFFF;
+        opacity:1;
+      }
+    }
+
+    .action-panel{
+      position:absolute;
+      bottom:25px;
+      right:200px;
+      display:flex;
+      border:solid 3px #4A4A4A;
+      border-radius:40px;
+      width:220px;
+      overflow: hidden;
+
+      .action{
+        background-color:#161616;
+        width:110px;
+        text-align: center;
+        padding:10px;
+        border-left:solid 1px #4A4A4A;
+        border-right:solid 1px #4A4A4A;
+        cursor:pointer;
+        color:#AAAAAA;
+        opacity:0.8;
+        font-weight:bold;
+      }
+
+      .action.active{
+        color:#FFFFFF;
+        opacity:1;
+      }
+
+      .action:last-child{
+        padding-right:15px;
+      }
+    }
+  }
+
+  .bottom-row{
+    jn-player{
+      margin-top:-60px;
+    }
+  }
+
+  jn-player{
+    opacity:0.7;
+    z-index:100;
+  }
+
+  jn-player.active{
+    opacity:1;
+  }
+}
+
+.button-panel{
+  display: flex;
+
+  jn-button{
+    margin-right:10px;
+  }
+}

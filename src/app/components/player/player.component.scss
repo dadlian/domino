@@ -1,0 +1,74 @@
+:host{
+  z-index:100;
+
+  .jn-player{
+    display: flex;
+    flex-direction: column;
+
+    .hand{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom:40px;
+
+      jn-domino{
+        transform:rotate(90deg);
+        margin:0px -5px;
+      }
+
+      jn-domino.active{
+        margin-top:-50px;
+      }
+    }
+
+    .profile{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .avatar{
+        border:solid 3px #3A3A3A;
+        height:65px;
+        width:65px;
+        border-radius: 32.5px;
+        overflow: hidden;
+        z-index:2;
+        background-color: #FFFFFF;
+
+        img{
+          margin-top:-5px;
+          margin-left:-5px;
+          height:65px;
+          width:65px;
+        }
+      }
+
+      .details{
+        margin-left:-32.5px;
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        border:solid 3px #6A6A6A;
+        width:150px;
+        border-radius:40px;
+        color:#FFFFFF;
+        background-color:#161616;
+
+        div{
+          text-align:center;
+          width:100%;
+          padding:2.5px 0px;
+        }
+
+        .name{
+          border-bottom: solid 1px #6A6A6A;
+          font-weight:bold;
+        }
+
+        .role{
+          font-size:0.9em;
+        }
+      }
+    }
+  }
+}
