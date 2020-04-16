@@ -6,33 +6,37 @@ import { Observable, Subject } from 'rxjs';
 export class Game{
   public status: string;
   public board: Board;
-  public deck: Array<Domino>;
   public players: Array<Player>;
-  public activePlayer: number;
   public activePlayed: boolean;
-  public plays: number;
-  private _statusChange: Subject<string>;
 
-  constructor(){
+  private _deck: Array<Domino>;
+  private _activePlayer: number;
+  private _plays: number;
+  private _statusChange: Subject<string>;
+  private _type: string;
+
+  constructor(type: string){
     this.status = "Pending";
     this.board = new Board();
-    this.deck = [];
     this.players = [];
-    this.activePlayer = 0;
     this.activePlayed = false;
-    this.plays = 0;
-    this._statusChange = new Subject<string>();
 
-    //Initialise Deck
+    this._deck = [];
+    this._activePlayer = 0;
+    this._plays = 0;
+    this._statusChange = new Subject<string>();
+    this._type = type;
+
+    //Initialise _deck
     for(let i = 0; i < 7; i++){
       for(let j = i; j < 7; j++){
-        this.deck.push(new Domino(i,j));
+        this._deck.push(new Domino(i,j));
       }
     }
 
     //Initialise 4 AI Players
     for(let i = 1; i <= 4; i++){
-      this.players.push(new Player(`Player ${i}`));
+      this.players.push(new Player(`AI ${i}`,(this._type == 'Push')?"Player":"Jailman"));
     }
   }
 
@@ -42,6 +46,7 @@ export class Game{
       if(!this.players[i].human){
         Object.assign(this.players[i],player);
         this.players[i].human = true;
+        this.players[i].role = "Jailman";
         joined = i;
         break;
       }
@@ -50,27 +55,31 @@ export class Game{
     return joined;
   }
 
+  get turn(): number{
+    return Math.ceil((this._plays + 1) / this.players.length);
+  }
+
   start(){
     this.status = "Playing";
     this._statusChange.next(this.status);
     this.board.center = null;
-    this.plays = 0;
+    this._plays = 0;
     this._shuffle(5);
     this._deal();
 
     for(let i = 0; i < this.players.length; i++){
       for(let domino of this.players[i].hand){
         if(domino.value[0] == 6 && domino.value[1] == 6){
-          this.activePlayer = i;
-          if(!this.getActivePlayer().human){
-            setTimeout(() => {
-              this._aiTurn();
-            },1000)
-          }
-
+          this._activePlayer = i;
           break;
         }
       }
+    }
+
+    if(!this.getActivePlayer().human){
+      setTimeout(() => {
+        this._aiTurn();
+      },1000)
     }
   }
 
@@ -79,10 +88,10 @@ export class Game{
       return false;
     }
 
-    let dominoIndex = this.players[this.activePlayer].hand.indexOf(domino);
+    let dominoIndex = this.players[this._activePlayer].hand.indexOf(domino);
     let validPlay = dominoIndex >= 0 && this.board.playLeft(domino);
     if(validPlay){
-      this.players[this.activePlayer].hand.splice(dominoIndex,1);
+      this.players[this._activePlayer].hand.splice(dominoIndex,1);
       this.activePlayed = true;
     }
 
@@ -94,10 +103,10 @@ export class Game{
       return false;
     }
 
-    let dominoIndex = this.players[this.activePlayer].hand.indexOf(domino);
+    let dominoIndex = this.players[this._activePlayer].hand.indexOf(domino);
     let validPlay = dominoIndex >= 0 && this.board.playRight(domino);
     if(validPlay){
-      this.players[this.activePlayer].hand.splice(dominoIndex,1);
+      this.players[this._activePlayer].hand.splice(dominoIndex,1);
       this.activePlayed = true;
     }
 
@@ -108,8 +117,7 @@ export class Game{
     if(this.canEndTurn()){
       //Check if game is finished
       if(this.getActivePlayer().hand.length == 0){
-        this.status = "Completed";
-        this._statusChange.next(this.status);
+        this._endRound();
       }else if(this.isShut()){
         let counts = [];
         for(let player of this.players){
@@ -119,17 +127,16 @@ export class Game{
         let minCount = Math.min(...counts);
         let playerCount = counts.filter(item => item == minCount).length;
         if(playerCount == 1){
-          this.activePlayer = counts.indexOf(minCount);
-          this.status = "Completed";
-          this._statusChange.next(this.status);
+          this._activePlayer = counts.indexOf(minCount);
+          this._endRound();
         }else{
           this.status = "Drawn";
           this._statusChange.next(this.status);
         }
       }else{
-        this.activePlayer = (this.activePlayer + 1) % this.players.length;
+        this._activePlayer = (this._activePlayer + 1) % this.players.length;
         this.activePlayed = false;
-        this.plays += 1;
+        this._plays += 1;
 
         if(!this.getActivePlayer().human){
           setTimeout(() => {
@@ -140,12 +147,20 @@ export class Game{
     }
   }
 
-  get turn(): number{
-    return Math.ceil((this.plays + 1) / this.players.length);
+  private _endRound(){
+    if(this._type == "Push"){
+      this.status = "Completed";
+    }else{
+      this.status = "Intermission";
+      this.getActivePlayer().role = "Officer";
+      this.getActivePlayer().score += 1;
+    }
+
+    this._statusChange.next(this.status);
   }
 
   canPlayLeft(domino: Domino){
-    if(this.plays == 0){
+    if(this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
       return !this.activePlayed && this.board.canPlayLeft(domino);
@@ -153,7 +168,7 @@ export class Game{
   }
 
   canPlayRight(domino: Domino){
-    if(this.plays == 0){
+    if(this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
       return !this.activePlayed && this.board.canPlayRight(domino);
@@ -161,15 +176,24 @@ export class Game{
   }
 
   canEndTurn(){
-    return this.activePlayed || this._getValidPlays(this.players[this.activePlayer]) == 0;
+    return this.activePlayed || this._getValidPlays(this.players[this._activePlayer]) == 0;
   }
 
   getActivePlayer(){
-    return this.players[this.activePlayer];
+    return this.players[this._activePlayer];
   }
 
   statusChanged(): Observable<string>{
     return this._statusChange;
+  }
+
+  isShut(){
+    let isShut: boolean = true;
+    for(let player of this.players){
+      isShut = isShut && (this._getValidPlays(player) == 0);
+    }
+
+    return isShut;
   }
 
   private _getValidPlays(player: Player){
@@ -189,14 +213,14 @@ export class Game{
       let j: number = 0;
       let candidate: Domino = null;
 
-      for (i = this.deck.length - 1; i > 0; i--){
+      for (i = this._deck.length - 1; i > 0; i--){
         j = Math.floor(Math.random() * (i + 1));
-        candidate = this.deck[i];
+        candidate = this._deck[i];
 
         //Reset Domino
         candidate.reset();
-        this.deck[i] = this.deck[j];
-        this.deck[j] = candidate;
+        this._deck[i] = this._deck[j];
+        this._deck[j] = candidate;
       }
     }
   }
@@ -207,10 +231,10 @@ export class Game{
       player.hand.length = 0;
     }
 
-    let cardsPerPlayer = Math.ceil(this.deck.length / this.players.length);
+    let cardsPerPlayer = Math.ceil(this._deck.length / this.players.length);
     for(let i = 0; i < cardsPerPlayer; i++){
       for(let j = 0; j < this.players.length; j++){
-        this.players[j].deal(this.deck[(i*this.players.length)+j])
+        this.players[j].deal(this._deck[(i*this.players.length)+j])
       }
     }
   }
@@ -223,14 +247,5 @@ export class Game{
     }
 
     this.endTurn();
-  }
-
-  isShut(){
-    let isShut: boolean = true;
-    for(let player of this.players){
-      isShut = isShut && (this._getValidPlays(player) == 0);
-    }
-
-    return isShut;
   }
 }

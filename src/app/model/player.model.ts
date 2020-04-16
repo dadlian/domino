@@ -3,13 +3,15 @@ import { Domino } from './domino.model';
 export class Player{
   public name: string;
   public role: string;
+  public score: number;
   public avatar: string;
   public human: boolean;
   public hand: Array<Domino>;
 
-  constructor(name: string){
+  constructor(name: string, role: string = "Player"){
     this.name = name;
-    this.role = "Player";
+    this.role = role;
+    this.score = 0;
     this.avatar = "avatar.png";
     this.human = false;
     this.hand = [];

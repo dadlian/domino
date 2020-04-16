@@ -14,7 +14,7 @@ export class PlayerComponent{
   @Output() pickDomino: EventEmitter<Domino>;
 
   constructor(){
-    this.player = new Player("Player 1");
+    this.player = null;
     this.showHand = false;
     this.active = null;
     this.pickDomino = new EventEmitter<Domino>();
@@ -22,5 +22,14 @@ export class PlayerComponent{
 
   dominoPicked(domino: Domino){
     this.pickDomino.emit(domino);
+  }
+
+  getPoints(){
+    let points = [];
+    for(let i = 0; i < this.player.score; i++){
+      points.push(i);
+    }
+
+    return points;
   }
 }

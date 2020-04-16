@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BoardComponent, ModalComponent } from '../../components/components.module';
+import { GameService } from '../../services/game.service';
 import { Game } from '../../model/game.model';
 import { Domino } from '../../model/domino.model';
 import { Player } from '../../model/player.model';
@@ -16,33 +17,31 @@ export class GameScreen{
   public activeDomino: Domino;
   public viewPoint: number;
 
-  constructor(private _router: Router){
-    this.game = new Game();
-    this.viewPoint = this.game.join(new Player("Sven"));
+  constructor(private _router: Router, private _gameService: GameService){
+    this.viewPoint = 0;
   }
 
   ngOnInit(){
+    this.game = this._gameService.getCurrentGame();
+    this.modal.show()
+
     this.game.statusChanged().subscribe(status => {
       switch(status){
+        case "Playing":
+          this.modal.hide();
+          break;
+        case "Intermission":
+          this.modal.show();
+          break;
         case "Completed":
           this.modal.show();
           break;
       }
     })
-
-    this.newGame();
   }
 
   selectDomino(domino: Domino){
     this.activeDomino = domino;
-  }
-
-  canPlayLeft(){
-    return this.myTurn() && this.activeDomino && this.game.canPlayLeft(this.activeDomino);
-  }
-
-  canPlayRight(){
-    return this.myTurn() && this.activeDomino && this.game.canPlayRight(this.activeDomino);
   }
 
   endTurn(){
@@ -67,8 +66,9 @@ export class GameScreen{
     }
   }
 
-  myTurn(){
-    return this.game.players[this.viewPoint] == this.game.getActivePlayer();
+  start(){
+    this.viewPoint = this.game.join(new Player("Sven"));
+    this.newGame();
   }
 
   newGame(){
@@ -80,5 +80,17 @@ export class GameScreen{
 
   mainMenu(){
     this._router.navigate(["/menu"]);
+  }
+
+  canPlayLeft(){
+    return this.myTurn() && this.activeDomino && this.game.canPlayLeft(this.activeDomino);
+  }
+
+  canPlayRight(){
+    return this.myTurn() && this.activeDomino && this.game.canPlayRight(this.activeDomino);
+  }
+
+  myTurn(){
+    return this.game.players[this.viewPoint] == this.game.getActivePlayer();
   }
 }
