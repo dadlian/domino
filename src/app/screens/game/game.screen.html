@@ -7,9 +7,9 @@
     <jn-board [board]="game.board"></jn-board>
     <jn-player [player]='game.players[(viewPoint+1) % 4]' [showHand]="game.isShut()" position='right' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}"></jn-player>
     <div class='status-dial'>
-      <div class='status' (click)="endTurn()" [ngClass]="{active:game.canEndTurn()}">
+      <div class='status' (click)="endTurn()" [ngClass]="{active:myTurn() && game.canEndTurn()}">
         <span>Turn {{game.turn}}</span>
-        <span>{{myTurn()?'Pass':'Waiting for '+game.getActivePlayer().name}}</span>
+        <span>{{myTurn()?'Wrap':'Waiting for '+game.getActivePlayer().name}}</span>
       </div>
     </div>
     <div class='action-panel'>
@@ -23,7 +23,7 @@
 </div>
 <jn-modal>
   <h1 *ngIf="game.status == 'Pending'">Game Ready</h1>
-  <h1 *ngIf="game.status == 'Intermission' || game.status == 'Completed'">{{game.getActivePlayer().name}} Wins!</h1>
+  <h1 *ngIf="game.status == 'Intermission' || game.status == 'Completed'">{{game.isShut()?"Game Shut - ":""}}{{game.getActivePlayer().name}} Wins!</h1>
   <h1 *ngIf="game.status == 'Drawn'">Game Squashed</h1>
   <div class='button-panel'>
     <jn-button *ngIf="game.status == 'Pending'" (click)="start()" label="Start Now"></jn-button>

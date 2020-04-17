@@ -1,3 +1,4 @@
 <div class='jn-domino'>
-  <img src='assets/{{domino.value[0]}}-{{domino.value[1]}}.png' alt='domino-{{domino.value[0]}}-{{domino.value[1]}}' />
+  <img *ngIf="!hidden" src='assets/{{domino.value[0]}}-{{domino.value[1]}}.png' alt='domino-{{domino.value[0]}}-{{domino.value[1]}}' />
+  <img *ngIf="hidden" src='assets/face-down.png' alt='domino-face-down' />
 </div>

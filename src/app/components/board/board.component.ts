@@ -52,7 +52,7 @@ export class BoardComponent{
         width += 50;
       }
 
-      if(width > 300 && (currentDomino.previous.isDouble() || !currentDomino.isDouble())){
+      if(width > 225 && (currentDomino.previous.isDouble() || !currentDomino.isDouble())){
         this.leftFull = true;
         break;
       }
@@ -84,7 +84,7 @@ export class BoardComponent{
         width += 50;
       }
 
-      if(width > 300 && (currentDomino.next.isDouble() || !currentDomino.isDouble())){
+      if(width > 225 && (currentDomino.next.isDouble() || !currentDomino.isDouble())){
         this.rightFull = true;
         break;
       }
@@ -121,7 +121,7 @@ export class BoardComponent{
         width += 50;
       }
 
-      if(width > 200 && (currentDomino.previous.isDouble() || !currentDomino.isDouble())){
+      if(width > 150 && (currentDomino.previous.isDouble() || !currentDomino.isDouble())){
         this.upFull = true;
         break;
       }
@@ -154,7 +154,7 @@ export class BoardComponent{
         width += 50;
       }
 
-      if(width > 200 && (currentDomino.next.isDouble() || !currentDomino.isDouble())){
+      if(width > 150 && (currentDomino.next.isDouble() || !currentDomino.isDouble())){
         this.downFull = true;
         break;
       }

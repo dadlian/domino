@@ -1,11 +1,8 @@
-<div class='jn-player'>
-  <div *ngIf="showHand" class='hand'>
+<div class='jn-player' [ngClass]="position">
+  <div class='hand'>
     <ng-container *ngFor="let domino of player.hand">
-      <jn-domino (click)="dominoPicked(domino)" [domino]="domino" [ngClass]="{active:domino==active}"></jn-domino>
+      <jn-domino [hidden]="!showHand" (click)="dominoPicked(domino)" [domino]="domino" [ngClass]="{active:domino==active}"></jn-domino>
     </ng-container>
-  </div>
-  <div class='score'>
-    <div class='point' *ngFor="let point of getPoints()"></div>
   </div>
   <div class='profile'>
     <div class='avatar'>
@@ -15,5 +12,8 @@
       <div class='name'>{{player.name}}</div>
       <div class='role'>{{player.role}}</div>
     </div>
+  </div>
+  <div class='score'>
+    <div class='point' *ngFor="let point of getPoints()"></div>
   </div>
 </div>

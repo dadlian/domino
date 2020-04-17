@@ -20,7 +20,7 @@
     .status-dial{
       position:absolute;
       bottom:15px;
-      left:200px;
+      left:160px;
       height:125px;
       width:125px;
       border-radius:75px;
@@ -66,7 +66,7 @@
     .action-panel{
       position:absolute;
       bottom:25px;
-      right:200px;
+      right:160px;
       display:flex;
       border:solid 3px #4A4A4A;
       border-radius:40px;
@@ -98,9 +98,6 @@
   }
 
   .bottom-row{
-    jn-player{
-      margin-top:-60px;
-    }
   }
 
   jn-player{

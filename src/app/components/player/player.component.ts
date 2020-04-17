@@ -11,12 +11,14 @@ export class PlayerComponent{
   @Input() player: Player;
   @Input() showHand: boolean;
   @Input() active: Domino;
+  @Input() position: string;
   @Output() pickDomino: EventEmitter<Domino>;
 
   constructor(){
     this.player = null;
     this.showHand = false;
     this.active = null;
+    this.position = "bottom";
     this.pickDomino = new EventEmitter<Domino>();
   }
 

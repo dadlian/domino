@@ -14,6 +14,7 @@ export class Game{
   private _plays: number;
   private _statusChange: Subject<string>;
   private _type: string;
+  private _firstGame: boolean;
 
   constructor(type: string){
     this.status = "Pending";
@@ -26,6 +27,7 @@ export class Game{
     this._plays = 0;
     this._statusChange = new Subject<string>();
     this._type = type;
+    this._firstGame = true;
 
     //Initialise _deck
     for(let i = 0; i < 7; i++){
@@ -61,17 +63,21 @@ export class Game{
 
   start(){
     this.status = "Playing";
+    this.activePlayed = false;
     this._statusChange.next(this.status);
     this.board.center = null;
     this._plays = 0;
     this._shuffle(5);
     this._deal();
 
-    for(let i = 0; i < this.players.length; i++){
-      for(let domino of this.players[i].hand){
-        if(domino.value[0] == 6 && domino.value[1] == 6){
-          this._activePlayer = i;
-          break;
+    //Let Double Six Pose for First Game
+    if(this._firstGame){
+      for(let i = 0; i < this.players.length; i++){
+        for(let domino of this.players[i].hand){
+          if(domino.value[0] == 6 && domino.value[1] == 6){
+            this._activePlayer = i;
+            break;
+          }
         }
       }
     }
@@ -151,6 +157,7 @@ export class Game{
     if(this._type == "Push"){
       this.status = "Completed";
     }else{
+      this._firstGame = false;
       this.status = "Intermission";
       this.getActivePlayer().role = "Officer";
       this.getActivePlayer().score += 1;
@@ -160,7 +167,7 @@ export class Game{
   }
 
   canPlayLeft(domino: Domino){
-    if(this._plays == 0){
+    if(this._firstGame && this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
       return !this.activePlayed && this.board.canPlayLeft(domino);
@@ -168,7 +175,7 @@ export class Game{
   }
 
   canPlayRight(domino: Domino){
-    if(this._plays == 0){
+    if(this._firstGame && this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
       return !this.activePlayed && this.board.canPlayRight(domino);

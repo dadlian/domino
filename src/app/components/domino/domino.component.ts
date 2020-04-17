@@ -8,8 +8,10 @@ import { Domino } from '../../model/domino.model';
 })
 export class DominoComponent{
   @Input() domino: Domino;
+  @Input() hidden: boolean;
 
   constructor(){
     this.domino = new Domino(0,0);
+    this.hidden = false;
   }
 }
