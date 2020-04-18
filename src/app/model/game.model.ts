@@ -63,10 +63,12 @@ export class Game{
 
   start(){
     this.status = "Playing";
-    this.activePlayed = false;
     this._statusChange.next(this.status);
+
+    this.activePlayed = false;
     this.board.center = null;
     this._plays = 0;
+    
     this._shuffle(5);
     this._deal();
 
@@ -159,8 +161,26 @@ export class Game{
     }else{
       this._firstGame = false;
       this.status = "Intermission";
-      this.getActivePlayer().role = "Officer";
+      this.getActivePlayer().role = "Witness";
       this.getActivePlayer().score += 1;
+
+      //Check if everyone has come out of jail
+      let squash: boolean = true;
+      for(let i = 0; i < this.players.length; i++){
+        squash = squash && (this.players[i].score > 0);
+      }
+
+      if(squash){
+        this.status = "Squashed";
+      //Check if the active player has jailed someone
+    }else if(this.getActivePlayer().score == 6){
+        this.status = "Victory";
+        this.getActivePlayer().role = "Officer";
+        let pusher = this.players[(this._activePlayer+3)%4];
+        if(pusher.score == 0){
+          pusher.role = "Antiman";
+        }
+      }
     }
 
     this._statusChange.next(this.status);

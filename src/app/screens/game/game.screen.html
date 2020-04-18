@@ -21,14 +21,22 @@
     <jn-player [player]='game.players[viewPoint]' [showHand]="true" position='bottom' [active]="activeDomino" (pickDomino)="selectDomino($event)" [ngClass]="{active:game.getActivePlayer() == game.players[viewPoint]}"></jn-player>
   </div>
 </div>
-<jn-modal>
+<jn-modal #joinModal>
+  <h1>Enter Your Name</h1>
+  <input [(ngModel)]="player.name" type='text' />
+  <div class='button-panel'>
+    <jn-button (click)="join()" label="Join"></jn-button>
+  </div>
+</jn-modal>
+<jn-modal #statusModal>
   <h1 *ngIf="game.status == 'Pending'">Game Ready</h1>
   <h1 *ngIf="game.status == 'Intermission' || game.status == 'Completed'">{{game.isShut()?"Game Shut - ":""}}{{game.getActivePlayer().name}} Wins!</h1>
-  <h1 *ngIf="game.status == 'Drawn'">Game Squashed</h1>
+  <h1 *ngIf="game.status == 'Drawn'">Game Push</h1>
   <div class='button-panel'>
     <jn-button *ngIf="game.status == 'Pending'" (click)="start()" label="Start Now"></jn-button>
     <jn-button *ngIf="game.status == 'Intermission'" (click)="newGame()" label="Continue"></jn-button>
     <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn'" (click)="newGame()" label="New Game"></jn-button>
-    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn'" (click)="mainMenu()" label="Main Menu"></jn-button>
+    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn' || game.status == 'Victory'" (click)="mainMenu()" label="Main Menu"></jn-button>
   </div>
 </jn-modal>
+<jn-summary [game]="game"></jn-summary>

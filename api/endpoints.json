@@ -1,0 +1,11 @@
+{
+  "endpoints":[
+    {
+      "name":"Hello World Controller",
+      "path":"hello",
+      "controller":"HelloWorldController",
+      "roles":{},
+      "parameters":[]
+    }
+  ]
+}
