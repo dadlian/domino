@@ -3,9 +3,22 @@
     <h1>Jrake Night</h1>
     <div class='items'>
       <div class='item' (click)="soloPlay()">Solo Play</div>
-      <div class='item'>Multiplayer</div>
-      <div class='item'>Join Game</div>
+      <div class='item' (click)="multiplayer()">Multiplayer</div>
+      <div class='item' (click)="joinModal.show()">Join Game</div>
       <div class='item'>Options</div>
     </div>
   </div>
 </div>
+<jn-modal #joinModal>
+  <h1>Enter Game Code</h1>
+  <input [(ngModel)]="code" type='text' />
+  <div class='button-panel'>
+    <jn-button (click)="joinGame()" label="Join"></jn-button>
+  </div>
+</jn-modal>
+<jn-modal #errorModal>
+  <h1>Game Not Found!</h1>
+  <div class='button-panel'>
+    <jn-button (click)="errorModal.hide()" label="OK"></jn-button>
+  </div>
+</jn-modal>

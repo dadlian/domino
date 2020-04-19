@@ -33,3 +33,18 @@
     }
   }
 }
+
+.button-panel{
+  display: flex;
+
+  jn-button{
+    margin-right:10px;
+  }
+}
+
+input{
+  text-align:center;
+  padding:10px;
+  font-size:1.25em;
+  margin:10px 0px;
+}

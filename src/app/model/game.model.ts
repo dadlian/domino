@@ -4,20 +4,33 @@ import { Domino } from './domino.model';
 import { Observable, Subject } from 'rxjs';
 
 export class Game{
+  public code: string;
   public status: string;
+  public type: string;
+  public multiplayer: boolean;
+
   public board: Board;
   public players: Array<Player>;
   public activePlayed: boolean;
 
+  private _self: string;
   private _deck: Array<Domino>;
   private _activePlayer: number;
   private _plays: number;
   private _statusChange: Subject<string>;
-  private _type: string;
   private _firstGame: boolean;
 
-  constructor(type: string){
+  constructor(gameData: any){
+    this.code = "000000";
+    this.type = "Push";
     this.status = "Pending";
+    this.multiplayer = false;
+
+    this._self = gameData.self;
+    delete gameData.self;
+
+    Object.assign(this,gameData);
+
     this.board = new Board();
     this.players = [];
     this.activePlayed = false;
@@ -26,7 +39,6 @@ export class Game{
     this._activePlayer = 0;
     this._plays = 0;
     this._statusChange = new Subject<string>();
-    this._type = type;
     this._firstGame = true;
 
     //Initialise _deck
@@ -38,7 +50,7 @@ export class Game{
 
     //Initialise 4 AI Players
     for(let i = 1; i <= 4; i++){
-      this.players.push(new Player(`AI ${i}`,(this._type == 'Push')?"Player":"Jailman"));
+      this.players.push(new Player(`AI ${i}`,(this.type == 'Push')?"Player":"Jailman"));
     }
   }
 
@@ -68,7 +80,7 @@ export class Game{
     this.activePlayed = false;
     this.board.center = null;
     this._plays = 0;
-    
+
     this._shuffle(5);
     this._deal();
 
@@ -156,7 +168,7 @@ export class Game{
   }
 
   private _endRound(){
-    if(this._type == "Push"){
+    if(this.type == "Push"){
       this.status = "Completed";
     }else{
       this._firstGame = false;
