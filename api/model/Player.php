@@ -18,7 +18,19 @@
     public $lastPing;
 
     public static function getURITemplate(){
-      return "/games/{id}/players/{id}";
+      return "/games/{Game:players}/players/{id}";
     }
+
+    protected function getCustomFields(){
+      $customFields = [];
+      $customFields["id"] = $this->getId();
+      return $customFields;
+    }
+
+    protected function assertsConsistency(){
+      return false;
+    }
+
+
   }
 ?>

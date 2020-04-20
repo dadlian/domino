@@ -22,7 +22,7 @@ export class GameScreen{
 
   constructor(private _router: Router, private _gameService: GameService){
     this.game = null;
-    this.player = new Player("");
+    this.player = new Player({});
     this.activeDomino = null;
     this.viewPoint = 0;
   }
@@ -34,6 +34,8 @@ export class GameScreen{
     this.game.statusChanged().subscribe(status => {
       switch(status){
         case "Playing":
+          this.activeDomino = null;
+          this.board.reset();
           this.statusModal.hide();
           break;
         case "Intermission":
@@ -82,21 +84,17 @@ export class GameScreen{
     if(!this.player.name){
       return;
     }
-    
-    this.viewPoint = this.game.join(this.player);
-    this.joinModal.hide();
-    this.statusModal.show();
-  }
 
-  start(){
-    this.newGame();
-  }
+    this._gameService.join(this.player).then(viewPoint => {
+      this.viewPoint = viewPoint;
 
-  newGame(){
-    this.statusModal.hide();
-    this.activeDomino = null;
-    this.board.reset();
-    this.game.start();
+      if(this.viewPoint < 0){
+        this.viewPoint = 0;
+      }
+
+      this.joinModal.hide();
+      this.statusModal.show();
+    })
   }
 
   mainMenu(){

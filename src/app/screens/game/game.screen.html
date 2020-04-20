@@ -29,13 +29,15 @@
   </div>
 </jn-modal>
 <jn-modal #statusModal>
-  <h1 *ngIf="game.status == 'Pending'">Game Ready</h1>
+  <h1 *ngIf="game.status == 'Pending' && !game.multiplayer">Game Ready</h1>
+  <h1 *ngIf="game.status == 'Pending' && game.multiplayer">Waiting for Players</h1>
   <h1 *ngIf="game.status == 'Intermission' || game.status == 'Completed'">{{game.isShut()?"Game Shut - ":""}}{{game.getActivePlayer().name}} Wins!</h1>
   <h1 *ngIf="game.status == 'Drawn'">Game Push</h1>
+  <div *ngIf="game.status == 'Pending' && game.multiplayer">Game Code: {{game.code}}</div>
   <div class='button-panel'>
-    <jn-button *ngIf="game.status == 'Pending'" (click)="start()" label="Start Now"></jn-button>
-    <jn-button *ngIf="game.status == 'Intermission'" (click)="newGame()" label="Continue"></jn-button>
-    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn'" (click)="newGame()" label="New Game"></jn-button>
+    <jn-button *ngIf="game.status == 'Pending' && !game.multiplayer" (click)="game.start()" label="Start Now"></jn-button>
+    <jn-button *ngIf="game.status == 'Intermission'" (click)="game.start()" label="Continue"></jn-button>
+    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn'" (click)="game.start()" label="New Game"></jn-button>
     <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn' || game.status == 'Victory'" (click)="mainMenu()" label="Main Menu"></jn-button>
   </div>
 </jn-modal>

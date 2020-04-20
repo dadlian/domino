@@ -4,30 +4,31 @@ import { Domino } from './domino.model';
 import { Observable, Subject } from 'rxjs';
 
 export class Game{
+  public self: string;
   public code: string;
   public status: string;
   public type: string;
   public multiplayer: boolean;
+  public deck: Array<Domino>;
+  public round: number;
 
   public board: Board;
   public players: Array<Player>;
   public activePlayed: boolean;
 
-  private _self: string;
-  private _deck: Array<Domino>;
   private _activePlayer: number;
   private _plays: number;
   private _statusChange: Subject<string>;
   private _firstGame: boolean;
 
   constructor(gameData: any){
+    this.self = "";
     this.code = "000000";
     this.type = "Push";
     this.status = "Pending";
     this.multiplayer = false;
-
-    this._self = gameData.self;
-    delete gameData.self;
+    this.deck = [];
+    this.round = 1;
 
     Object.assign(this,gameData);
 
@@ -35,7 +36,6 @@ export class Game{
     this.players = [];
     this.activePlayed = false;
 
-    this._deck = [];
     this._activePlayer = 0;
     this._plays = 0;
     this._statusChange = new Subject<string>();
@@ -44,29 +44,50 @@ export class Game{
     //Initialise _deck
     for(let i = 0; i < 7; i++){
       for(let j = i; j < 7; j++){
-        this._deck.push(new Domino(i,j));
+        this.deck.push(new Domino(i,j));
       }
     }
 
     //Initialise 4 AI Players
     for(let i = 1; i <= 4; i++){
-      this.players.push(new Player(`AI ${i}`,(this.type == 'Push')?"Player":"Jailman"));
+      this.players.push(new Player({name: `AI ${i}`,role: (this.type == 'Push')?"Player":"Jailman"}));
     }
   }
 
-  join(player: Player): number{
-    let joined: number = -1;
+  setPlayer(player: Player, index: number): boolean{
+    if(this.players[index].human){
+      return false;
+    }else{
+      Object.assign(this.players[index],player);
+      this.players[index].human = true;
+      this.players[index].role = "Jailman";
+
+      if(this.seatsAvailable() == 0){
+        this.start();
+      }
+
+      return true;
+    }
+  }
+
+  removePlayer(index: number): boolean{
+    if(this.players[index].human){
+      this.players[index].human = false;
+      this.players[index].name = `AI ${index+1}`;
+    }else{
+      return false;
+    }
+  }
+
+  seatsAvailable(): number{
+    let seatsAvailable = 0;
     for(let i = 0; i < this.players.length; i++){
       if(!this.players[i].human){
-        Object.assign(this.players[i],player);
-        this.players[i].human = true;
-        this.players[i].role = "Jailman";
-        joined = i;
-        break;
+        seatsAvailable++;
       }
     }
 
-    return joined;
+    return seatsAvailable;
   }
 
   get turn(): number{
@@ -74,6 +95,10 @@ export class Game{
   }
 
   start(){
+    if(this.status == "Playing"){
+      return true;
+    }
+
     this.status = "Playing";
     this._statusChange.next(this.status);
 
@@ -81,7 +106,10 @@ export class Game{
     this.board.center = null;
     this._plays = 0;
 
-    this._shuffle(5);
+    if(!this.multiplayer){
+      this._shuffle(5);
+    }
+
     this._deal();
 
     //Let Double Six Pose for First Game
@@ -252,14 +280,14 @@ export class Game{
       let j: number = 0;
       let candidate: Domino = null;
 
-      for (i = this._deck.length - 1; i > 0; i--){
+      for (i = this.deck.length - 1; i > 0; i--){
         j = Math.floor(Math.random() * (i + 1));
-        candidate = this._deck[i];
+        candidate = this.deck[i];
 
         //Reset Domino
         candidate.reset();
-        this._deck[i] = this._deck[j];
-        this._deck[j] = candidate;
+        this.deck[i] = this.deck[j];
+        this.deck[j] = candidate;
       }
     }
   }
@@ -270,10 +298,10 @@ export class Game{
       player.hand.length = 0;
     }
 
-    let cardsPerPlayer = Math.ceil(this._deck.length / this.players.length);
+    let cardsPerPlayer = Math.ceil(this.deck.length / this.players.length);
     for(let i = 0; i < cardsPerPlayer; i++){
       for(let j = 0; j < this.players.length; j++){
-        this.players[j].deal(this._deck[(i*this.players.length)+j])
+        this.players[j].deal(this.deck[(i*this.players.length)+j])
       }
     }
   }

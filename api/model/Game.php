@@ -14,8 +14,17 @@
     /** @Collection(type=@WadapiObject(class='Player',hidden=true)) */
     public $players;
 
+    /** @Collection(type=@WadapiObject(class='Domino')) */
+    public $deck;
+
     public static function getURITemplate(){
       return "/games/{id}";
+    }
+
+    protected function getCustomFields(){
+      $customFields = [];
+      $customFields["multiplayer"] = true;
+      return $customFields;
     }
   }
 ?>

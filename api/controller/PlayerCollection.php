@@ -19,7 +19,7 @@
     protected function countResources($parameters, $game){
       $sqlGateway = new SQLGateway();
       $searcher = new Searcher();
-      $searcher->addCriterion("Game","players",$game->getId());
+      $searcher->addCriterion("Game",$game->getId(),"players");
       $players = $sqlGateway->find("Player",$searcher);
       $filteredPlayers = [];
 
@@ -44,7 +44,7 @@
     protected function retrieveResources($start, $records, $parameters, $game){
       $sqlGateway = new SQLGateway();
       $searcher = new Searcher();
-      $searcher->addCriterion("Game","players",$game->getId());
+      $searcher->addCriterion("Game",$game->getId(),"players");
       $players = $sqlGateway->find("Player",$searcher);
       $filteredPlayers = [];
 
@@ -67,14 +67,39 @@
     }
 
     protected function createResource($data, $game){
+      //Check for available seats in this game
+      $sqlGateway = new SQLGateway();
+      $searcher = new Searcher();
+      $searcher->addCriterion("Game",$game->getId(),"players");
+      $players = $sqlGateway->find("Player",$searcher);
+      $takenSeats = [];
+
+      foreach($players as $player){
+        if((time() - $player->getLastPing()) <= 30){
+          $takenSeats[] = $player->getPosition();
+        }
+      }
+
+      if(sizeof($takenSeats) == 4){
+        ResponseHandler::conflict("Player could not be added. The game is already full.");
+      }
+
+      for($i=0; $i < 4; $i++){
+        if(!in_array($i,$takenSeats)){
+          $data["position"] = $i;
+          break;
+        }
+      }
+
+      //Attempt to initialise the player
       $player = new Player();
       $data["lastPing"] = strval(time());
 
-      //Attempt to initialise the player
       $player->build($data);
       if(!$player->hasBuildErrors()){
-        $sqlGateway = new SQLGateway();
-        $sqlGateway->save($player);
+        $players[] = $player;
+        $game->setPlayers($players);
+        $sqlGateway->save($game);
       }
 
       return $player;
