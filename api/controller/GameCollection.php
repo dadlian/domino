@@ -61,14 +61,16 @@
       $deck = [];
       for($i = 0; $i < 7; $i++){
         for($j = $i; $j < 7; $j++){
-          $deck[] = new Domino($i,$j);
+          $deck[] = "$i,$j";
         }
       }
+
+      shuffle($deck);
 
       $data["code"] = strtoupper($code);
       $data["status"] = "Pending";
       $data["players"] = [];
-      $data["deck"] = $deck;
+      $data["deck"] = join(";",$deck);
 
       $game->build($data);
       if(!$game->hasBuildErrors()){

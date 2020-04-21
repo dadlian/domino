@@ -14,8 +14,11 @@
     /** @Collection(type=@WadapiObject(class='Player',hidden=true)) */
     public $players;
 
-    /** @Collection(type=@WadapiObject(class='Domino')) */
+    /** @WadapiString(pattern="^([0-9],[0-9];?){28}$") */
     public $deck;
+
+    /** @WadapiString(pattern="^([0-9],[0-9],(left|right|pass);?)*$") */
+    public $plays;
 
     public static function getURITemplate(){
       return "/games/{id}";
@@ -25,6 +28,10 @@
       $customFields = [];
       $customFields["multiplayer"] = true;
       return $customFields;
+    }
+
+    protected function assertsConsistency(){
+      return false;
     }
   }
 ?>

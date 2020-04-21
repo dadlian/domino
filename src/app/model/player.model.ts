@@ -8,6 +8,7 @@ export class Player{
   public score: number;
   public avatar: string;
   public human: boolean;
+  public remote: boolean;
   public hand: Array<Domino>;
 
   constructor(playerData: any){
@@ -17,6 +18,7 @@ export class Player{
     this.score = 0;
     this.avatar = "avatar.png";
     this.human = false;
+    this.remote = false;
     this.hand = [];
 
     Object.assign(this,playerData);

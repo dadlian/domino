@@ -7,7 +7,7 @@
     <jn-board [board]="game.board"></jn-board>
     <jn-player [player]='game.players[(viewPoint+1) % 4]' [showHand]="game.isShut()" position='right' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}"></jn-player>
     <div class='status-dial'>
-      <div class='status' (click)="endTurn()" [ngClass]="{active:myTurn() && game.canEndTurn()}">
+      <div class='status' (click)="pass()" [ngClass]="{active:myTurn() && game.canEndTurn()}">
         <span>Turn {{game.turn}}</span>
         <span>{{myTurn()?'Wrap':'Waiting for '+game.getActivePlayer().name}}</span>
       </div>

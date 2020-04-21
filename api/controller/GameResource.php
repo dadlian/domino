@@ -13,6 +13,24 @@
       $data["code"] = $game->getCode();
       $data["type"] = $game->getType();
       $data["players"] = $game->getPlayers();
+      $data["deck"] = $game->getDeck();
+
+      $oldStatus = $game->getStatus();
+      $newStatus = $data["status"];
+
+      //Reset deck if game has gone to intermission
+      if($oldStatus == "Playing" && $newStatus == "Intermission"){
+        //Shuffle Deck
+        $deck = [];
+        for($i = 0; $i < 7; $i++){
+          for($j = $i; $j < 7; $j++){
+            $deck[] = "$i,$j";
+          }
+        }
+
+        shuffle($deck);
+        $data["deck"] = $deck;
+      }
 
       $game->build($data);
 

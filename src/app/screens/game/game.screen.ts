@@ -58,9 +58,9 @@ export class GameScreen{
     this.activeDomino = domino;
   }
 
-  endTurn(){
+  pass(){
     if(this.myTurn()){
-      this.game.endTurn();
+      this.game.pass();
     }
   }
 
@@ -68,7 +68,6 @@ export class GameScreen{
     if(this.canPlayLeft()){
       this.game.playLeft(this.activeDomino);
       this.activeDomino = null;
-      this.game.endTurn();
     }
   }
 
@@ -76,7 +75,6 @@ export class GameScreen{
     if(this.canPlayRight()){
       this.game.playRight(this.activeDomino);
       this.activeDomino = null;
-      this.game.endTurn();
     }
   }
 
@@ -93,7 +91,9 @@ export class GameScreen{
       }
 
       this.joinModal.hide();
-      this.statusModal.show();
+      if(!this.game.multiplayer || this.game.seatsAvailable() > 0){
+        this.statusModal.show();
+      }
     })
   }
 

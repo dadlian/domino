@@ -2,6 +2,7 @@ import { Board } from './board.model';
 import { Player } from './player.model';
 import { Domino } from './domino.model';
 import { Observable, Subject } from 'rxjs';
+import { GameService } from '../services/game.service';
 
 export class Game{
   public self: string;
@@ -9,26 +10,32 @@ export class Game{
   public status: string;
   public type: string;
   public multiplayer: boolean;
-  public deck: Array<Domino>;
   public round: number;
 
   public board: Board;
   public players: Array<Player>;
   public activePlayed: boolean;
 
+  private _deck: Array<Domino>;
   private _activePlayer: number;
   private _plays: number;
   private _statusChange: Subject<string>;
+  private _playMade: Subject<{domino: Domino, position: string}>;
   private _firstGame: boolean;
 
-  constructor(gameData: any){
+  constructor(gameData: any, private _gameService: GameService){
     this.self = "";
     this.code = "000000";
     this.type = "Push";
     this.status = "Pending";
     this.multiplayer = false;
-    this.deck = [];
+    this._deck = [];
     this.round = 1;
+
+    for(let domino of gameData.deck){
+      this._deck.push(domino);
+    }
+    delete gameData.domino;
 
     Object.assign(this,gameData);
 
@@ -39,12 +46,15 @@ export class Game{
     this._activePlayer = 0;
     this._plays = 0;
     this._statusChange = new Subject<string>();
+    this._playMade = new Subject<{domino: Domino, position: string}>();
     this._firstGame = true;
 
     //Initialise _deck
-    for(let i = 0; i < 7; i++){
-      for(let j = i; j < 7; j++){
-        this.deck.push(new Domino(i,j));
+    if(this._deck.length == 0){
+      for(let i = 0; i < 7; i++){
+        for(let j = i; j < 7; j++){
+          this._deck.push(new Domino(i,j));
+        }
       }
     }
 
@@ -128,6 +138,8 @@ export class Game{
       setTimeout(() => {
         this._aiTurn();
       },1000)
+    }else if(this.getActivePlayer().remote){
+      this._gameService.getPlay();
     }
   }
 
@@ -139,8 +151,13 @@ export class Game{
     let dominoIndex = this.players[this._activePlayer].hand.indexOf(domino);
     let validPlay = dominoIndex >= 0 && this.board.playLeft(domino);
     if(validPlay){
+      if(!this.getActivePlayer().remote){
+        this._playMade.next({domino: domino, position: "left"});
+      }
+
       this.players[this._activePlayer].hand.splice(dominoIndex,1);
       this.activePlayed = true;
+      this._endTurn();
     }
 
     return validPlay;
@@ -154,14 +171,73 @@ export class Game{
     let dominoIndex = this.players[this._activePlayer].hand.indexOf(domino);
     let validPlay = dominoIndex >= 0 && this.board.playRight(domino);
     if(validPlay){
+      if(!this.getActivePlayer().remote){
+        this._playMade.next({domino: domino, position: "right"});
+      }
+
       this.players[this._activePlayer].hand.splice(dominoIndex,1);
       this.activePlayed = true;
+      this._endTurn();
     }
 
     return validPlay;
   }
 
-  endTurn(){
+  pass(): boolean{
+    if(this.canEndTurn()){
+      if(!this.getActivePlayer().remote){
+        this._playMade.next({domino: null, position: "pass"});
+      }
+
+      this._endTurn();
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  canPlayLeft(domino: Domino){
+    if(this._firstGame && this._plays == 0){
+      return domino.value[0] == 6 && domino.value[1] == 6;
+    }else{
+      return !this.activePlayed && this.board.canPlayLeft(domino);
+    }
+  }
+
+  canPlayRight(domino: Domino){
+    if(this._firstGame && this._plays == 0){
+      return domino.value[0] == 6 && domino.value[1] == 6;
+    }else{
+      return !this.activePlayed && this.board.canPlayRight(domino);
+    }
+  }
+
+  canEndTurn(){
+    return this.activePlayed || this._getValidPlays(this.players[this._activePlayer]) == 0;
+  }
+
+  getActivePlayer(){
+    return this.players[this._activePlayer];
+  }
+
+  statusChanged(): Observable<string>{
+    return this._statusChange;
+  }
+
+  playMade(): Observable<{domino: Domino, position: string}>{
+    return this._playMade;
+  }
+
+  isShut(){
+    let isShut: boolean = true;
+    for(let player of this.players){
+      isShut = isShut && (this._getValidPlays(player) == 0);
+    }
+
+    return isShut;
+  }
+
+  private _endTurn(){
     if(this.canEndTurn()){
       //Check if game is finished
       if(this.getActivePlayer().hand.length == 0){
@@ -190,6 +266,8 @@ export class Game{
           setTimeout(() => {
             this._aiTurn();
           },1000)
+        }else if(this.getActivePlayer().remote){
+          this._gameService.getPlay();
         }
       }
     }
@@ -226,43 +304,6 @@ export class Game{
     this._statusChange.next(this.status);
   }
 
-  canPlayLeft(domino: Domino){
-    if(this._firstGame && this._plays == 0){
-      return domino.value[0] == 6 && domino.value[1] == 6;
-    }else{
-      return !this.activePlayed && this.board.canPlayLeft(domino);
-    }
-  }
-
-  canPlayRight(domino: Domino){
-    if(this._firstGame && this._plays == 0){
-      return domino.value[0] == 6 && domino.value[1] == 6;
-    }else{
-      return !this.activePlayed && this.board.canPlayRight(domino);
-    }
-  }
-
-  canEndTurn(){
-    return this.activePlayed || this._getValidPlays(this.players[this._activePlayer]) == 0;
-  }
-
-  getActivePlayer(){
-    return this.players[this._activePlayer];
-  }
-
-  statusChanged(): Observable<string>{
-    return this._statusChange;
-  }
-
-  isShut(){
-    let isShut: boolean = true;
-    for(let player of this.players){
-      isShut = isShut && (this._getValidPlays(player) == 0);
-    }
-
-    return isShut;
-  }
-
   private _getValidPlays(player: Player){
     let validPlays = 0;
     for(let domino of player.hand){
@@ -280,14 +321,14 @@ export class Game{
       let j: number = 0;
       let candidate: Domino = null;
 
-      for (i = this.deck.length - 1; i > 0; i--){
+      for (i = this._deck.length - 1; i > 0; i--){
         j = Math.floor(Math.random() * (i + 1));
-        candidate = this.deck[i];
+        candidate = this._deck[i];
 
         //Reset Domino
         candidate.reset();
-        this.deck[i] = this.deck[j];
-        this.deck[j] = candidate;
+        this._deck[i] = this._deck[j];
+        this._deck[j] = candidate;
       }
     }
   }
@@ -298,10 +339,10 @@ export class Game{
       player.hand.length = 0;
     }
 
-    let cardsPerPlayer = Math.ceil(this.deck.length / this.players.length);
+    let cardsPerPlayer = Math.ceil(this._deck.length / this.players.length);
     for(let i = 0; i < cardsPerPlayer; i++){
       for(let j = 0; j < this.players.length; j++){
-        this.players[j].deal(this.deck[(i*this.players.length)+j])
+        this.players[j].deal(this._deck[(i*this.players.length)+j])
       }
     }
   }
@@ -312,7 +353,5 @@ export class Game{
         break;
       }
     }
-
-    this.endTurn();
   }
 }
