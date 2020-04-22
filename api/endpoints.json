@@ -27,6 +27,13 @@
       "controller":"PlayerResource",
       "roles":{},
       "parameters":["game","player"]
+    },
+    {
+      "name":"Plays Collection",
+      "path":"games/@/plays",
+      "controller":"PlayCollection",
+      "roles":{},
+      "parameters":["game"]
     }
   ]
 }

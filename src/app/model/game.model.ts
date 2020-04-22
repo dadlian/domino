@@ -105,12 +105,10 @@ export class Game{
   }
 
   start(){
-    if(this.status == "Playing"){
-      return true;
+    if(this.status !== "Playing"){
+      this.status = "Playing";
+      this._statusChange.next(this.status);
     }
-
-    this.status = "Playing";
-    this._statusChange.next(this.status);
 
     this.activePlayed = false;
     this.board.center = null;
@@ -235,6 +233,15 @@ export class Game{
     }
 
     return isShut;
+  }
+
+  isWatching(){
+    let isWatching: boolean = true;
+    for(let i=0; i < this.players.length; i++){
+      isWatching = isWatching && (this.players[i].remote);
+    }
+
+    return isWatching;
   }
 
   private _endTurn(){

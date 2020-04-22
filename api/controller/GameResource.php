@@ -14,6 +14,7 @@
       $data["type"] = $game->getType();
       $data["players"] = $game->getPlayers();
       $data["deck"] = $game->getDeck();
+      $data["plays"] = $game->getPlays();
 
       $oldStatus = $game->getStatus();
       $newStatus = $data["status"];
@@ -28,8 +29,16 @@
           }
         }
 
-        shuffle($deck);
+        for($i = 0; $i < 5; $i++){
+          shuffle($deck);
+        }
+
         $data["deck"] = $deck;
+      }
+
+      //Reset plays if game has resumed
+      if($oldStatus == "Intermission" && $newStatus == "Playing"){
+        $data["plays"] = "";
       }
 
       $game->build($data);

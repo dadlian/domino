@@ -65,7 +65,9 @@
         }
       }
 
-      shuffle($deck);
+      for($i = 0; $i < 5; $i++){
+        shuffle($deck);
+      }
 
       $data["code"] = strtoupper($code);
       $data["status"] = "Pending";

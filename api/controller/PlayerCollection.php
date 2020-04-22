@@ -26,11 +26,11 @@
       foreach($players as $player){
         if(array_key_exists("active",$parameters)){
           $lastUpdate = (time() - $player->getLastPing());
-          if($parameters["active"] == "true" && $lastUpdate <= 30){
+          if($parameters["active"] == "true" && $lastUpdate <= 10){
             $filteredPlayers[] = $player;
           }
 
-          if($parameters["active"] == "false" && $lastUpdate > 30){
+          if($parameters["active"] == "false" && $lastUpdate > 10){
             $filteredPlayers[] = $player;
           }
         }else{
@@ -51,11 +51,11 @@
       foreach($players as $player){
         if(array_key_exists("active",$parameters)){
           $lastUpdate = (time() - $player->getLastPing());
-          if($parameters["active"] == "true" && $lastUpdate <= 30){
+          if($parameters["active"] == "true" && $lastUpdate <= 10){
             $filteredPlayers[] = $player;
           }
 
-          if($parameters["active"] == "false" && $lastUpdate > 30){
+          if($parameters["active"] == "false" && $lastUpdate > 10){
             $filteredPlayers[] = $player;
           }
         }else{
@@ -75,7 +75,7 @@
       $takenSeats = [];
 
       foreach($players as $player){
-        if((time() - $player->getLastPing()) <= 30){
+        if((time() - $player->getLastPing()) <= 10){
           $takenSeats[] = $player->getPosition();
         }
       }

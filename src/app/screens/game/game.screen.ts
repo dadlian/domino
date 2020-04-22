@@ -19,12 +19,14 @@ export class GameScreen{
   public player: Player;
   public activeDomino: Domino;
   public viewPoint: number;
+  public timer: number;
 
   constructor(private _router: Router, private _gameService: GameService){
     this.game = null;
     this.player = new Player({});
     this.activeDomino = null;
     this.viewPoint = 0;
+    this.timer = 10;
   }
 
   ngOnInit(){
@@ -40,6 +42,12 @@ export class GameScreen{
           break;
         case "Intermission":
           this.statusModal.show();
+
+          if(this.game.multiplayer){
+            setTimeout(() => {
+              this._continueGame();
+            },1000);
+          }
           break;
         case "Completed":
           this.statusModal.show();
@@ -55,7 +63,9 @@ export class GameScreen{
   }
 
   selectDomino(domino: Domino){
-    this.activeDomino = domino;
+    if(!this.game.isWatching()){
+      this.activeDomino = domino;
+    }
   }
 
   pass(){
@@ -111,5 +121,17 @@ export class GameScreen{
 
   myTurn(){
     return this.game.players[this.viewPoint] == this.game.getActivePlayer();
+  }
+
+  private _continueGame(){
+    if(this.timer > 0){
+      this.timer--;
+      setTimeout(() => {
+        this._continueGame();
+      },1000)
+    }else{
+      this.timer = 10;
+      this.game.start();
+    }
   }
 }
