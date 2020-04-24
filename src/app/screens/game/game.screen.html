@@ -1,27 +1,27 @@
 <div id='game-screen'>
   <div class='top-row'>
-    <jn-player [player]='game.players[(viewPoint + 2) % 4]' [showHand]="game.isShut()" position='top' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 2) % 4]}"></jn-player>
+    <jn-player [player]='game.players[(viewPoint + 2) % 4]' [showHand]="game.isShut()" [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 2) % 4]}" position="top"></jn-player>
   </div>
   <div class='middle-row'>
-    <jn-player [player]='game.players[(viewPoint+3) % 4]' [showHand]="game.isShut()" position='left' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 3) % 4]}"></jn-player>
+    <jn-player [player]='game.players[(viewPoint+3) % 4]' [showHand]="game.isShut()" position='left' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 3) % 4]}" position="left"></jn-player>
     <jn-board [board]="game.board"></jn-board>
-    <jn-player [player]='game.players[(viewPoint+1) % 4]' [showHand]="game.isShut()" position='right' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}"></jn-player>
+    <jn-player [player]='game.players[(viewPoint+1) % 4]' [showHand]="game.isShut()" position='right' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}" position="right"></jn-player>
     <div *ngIf="!game.isWatching()" class='status-dial'>
       <div class='status' (click)="pass()" [ngClass]="{active:myTurn() && game.canEndTurn()}">
         <span>Turn {{game.turn}}</span>
-        <span>{{myTurn()?'Wrap':'Waiting for '+game.getActivePlayer().name}}</span>
+        <span>{{myTurn()?'Wrap':'Waiting for '+game.getActivePlayer()?.name}}</span>
       </div>
     </div>
     <div *ngIf="!game.isWatching()" class='action-panel'>
-      <div class='action' [ngClass]="{active:canPlayLeft()}" (click)="playLeft()">Play Left</div>
-      <div class='action' [ngClass]="{active:canPlayRight()}" (click)="playRight()">Play Right</div>
+      <div class='action' [ngClass]="{active:canPlayLeft()}" (click)="playLeft()">Left</div>
+      <div class='action' [ngClass]="{active:canPlayRight()}" (click)="playRight()">Right</div>
     </div>
   </div>
   <div class='bottom-row'>
-    <jn-player [player]='game.players[viewPoint]' [showHand]="true" position='bottom' [active]="activeDomino" (pickDomino)="selectDomino($event)" [ngClass]="{active:game.getActivePlayer() == game.players[viewPoint]}"></jn-player>
+    <jn-player [player]='game.players[viewPoint]' [showHand]="true" position='bottom' [active]="activeDomino" (pickDomino)="selectDomino($event)" [ngClass]="{active:game.getActivePlayer() == game.players[viewPoint]}" position="bottom"></jn-player>
   </div>
 </div>
-<jn-modal #joinModal [hidden]="game.status !== 'Pending'">
+<jn-modal #joinModal [hidden]="game.seatsAvailable() == 0">
   <h1>Enter Your Name</h1>
   <input [(ngModel)]="player.name" type='text' />
   <div class='button-panel'>
@@ -29,17 +29,16 @@
   </div>
 </jn-modal>
 <jn-modal #statusModal>
-  <h1 *ngIf="game.status == 'Pending' && !game.multiplayer">Game Ready</h1>
-  <h1 *ngIf="game.status == 'Pending' && game.multiplayer">Waiting for Players</h1>
+  <h1 *ngIf="game.status == 'Pending' && !game.isMultiplayer()">Game Ready</h1>
+  <h1 *ngIf="game.status == 'Pending' && game.isMultiplayer()">Waiting for Players</h1>
   <h1 *ngIf="game.status == 'Intermission' || game.status == 'Completed'">{{game.isShut()?"Game Shut - ":""}}{{game.getActivePlayer().name}} Wins!</h1>
   <h1 *ngIf="game.status == 'Drawn'">Game Push</h1>
-  <div *ngIf="game.status == 'Pending' && game.multiplayer">Game Code: {{game.code}}</div>
-  <div *ngIf="game.status == 'Intermission' && game.multiplayer">Games will resume in {{timer}}</div>
+  <div *ngIf="game.status == 'Pending' && game.isMultiplayer()">Game Code: {{game.code}}</div>
+  <div *ngIf="(game.status == 'Drawn' || game.status == 'Intermission') && game.isMultiplayer()">Game will resume in {{timer}}</div>
   <div class='button-panel'>
-    <jn-button *ngIf="game.status == 'Pending' && !game.multiplayer" (click)="game.start()" label="Start Now"></jn-button>
-    <jn-button *ngIf="game.status == 'Intermission' && !game.multiplayer" (click)="game.start()" label="Continue"></jn-button>
-    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn'" (click)="game.start()" label="New Game"></jn-button>
-    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Drawn' || game.status == 'Victory'" (click)="mainMenu()" label="Main Menu"></jn-button>
+    <jn-button *ngIf="game.status == 'Pending' && !game.isMultiplayer()" (click)="game.start()" label="Start Now"></jn-button>
+    <jn-button *ngIf="(game.status == 'Drawn' || game.status == 'Intermission') && !game.isMultiplayer()" (click)="game.start()" label="Continue"></jn-button>
+    <jn-button *ngIf="game.status == 'Completed' || game.status == 'Victory'" (click)="mainMenu()" label="Main Menu"></jn-button>
   </div>
 </jn-modal>
 <jn-summary [game]="game"></jn-summary>

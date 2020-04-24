@@ -73,6 +73,8 @@
       $data["status"] = "Pending";
       $data["players"] = [];
       $data["deck"] = join(";",$deck);
+      $data["firstGame"] = true;
+      $data["shield"] = 0;
 
       $game->build($data);
       if(!$game->hasBuildErrors()){

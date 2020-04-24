@@ -41,13 +41,15 @@ export class GameScreen{
           this.statusModal.hide();
           break;
         case "Intermission":
+        case "Drawn":
           this.statusModal.show();
 
-          if(this.game.multiplayer){
+          if(this.game.isMultiplayer()){
             setTimeout(() => {
               this._continueGame();
             },1000);
           }
+
           break;
         case "Completed":
           this.statusModal.show();
@@ -93,6 +95,7 @@ export class GameScreen{
       return;
     }
 
+    this.player.role = (this.game.type == 'Push')?"Player":"Jailman";
     this._gameService.join(this.player).then(viewPoint => {
       this.viewPoint = viewPoint;
 
@@ -101,7 +104,7 @@ export class GameScreen{
       }
 
       this.joinModal.hide();
-      if(!this.game.multiplayer || this.game.seatsAvailable() > 0){
+      if(!this.game.isMultiplayer() || this.game.seatsAvailable() > 0){
         this.statusModal.show();
       }
     })

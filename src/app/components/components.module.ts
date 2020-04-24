@@ -9,12 +9,16 @@ import { ModalComponent } from './modal/modal.component';
 import { SummaryComponent } from './summary/summary.component';
 import { ButtonComponent } from './button/button.component';
 
+import { PositionDirective } from './directives/position.directive';
+
 export { DominoComponent } from './domino/domino.component';
 export { PlayerComponent } from './player/player.component';
 export { BoardComponent } from './board/board.component';
 export { ModalComponent } from './modal/modal.component';
 export { SummaryComponent } from './summary/summary.component';
 export { ButtonComponent } from './button/button.component';
+
+export { PositionDirective } from './directives/position.directive';
 
 @NgModule({
   imports: [
@@ -27,7 +31,8 @@ export { ButtonComponent } from './button/button.component';
     BoardComponent,
     ModalComponent,
     SummaryComponent,
-    ButtonComponent
+    ButtonComponent,
+    PositionDirective
   ],
   providers:[
   ],
@@ -37,7 +42,8 @@ export { ButtonComponent } from './button/button.component';
     BoardComponent,
     ModalComponent,
     SummaryComponent,
-    ButtonComponent
+    ButtonComponent,
+    PositionDirective
   ]
 })
 export class ComponentsModule{}

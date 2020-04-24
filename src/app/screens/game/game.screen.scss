@@ -1,15 +1,30 @@
 #game-screen{
   display:flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
-  height:100vh;
+  padding-top:20px;
   width:100vw;
+  position:relative;
 
-  .top-row,
+  jn-player{
+    width:480px;
+    position: absolute;
+  }
+
+  .top-row{
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top:25px;
+    height:70px;
+  }
+
   .bottom-row{
     display: flex;
     justify-content: center;
+    position: absolute;
+    bottom:15px;
+    height:70px;
   }
 
   .middle-row{
@@ -17,10 +32,18 @@
     align-items: center;
     position:relative;
 
+    jn-player.left{
+      left:-195px;
+    }
+
+    jn-player.right{
+      right:-195px;
+    }
+
     .status-dial{
       position:absolute;
-      bottom:15px;
-      left:160px;
+      bottom:10px;
+      left:10px;
       height:125px;
       width:125px;
       border-radius:75px;
@@ -65,12 +88,12 @@
 
     .action-panel{
       position:absolute;
-      bottom:25px;
-      right:160px;
+      bottom:15px;
+      right:15px;
       display:flex;
       border:solid 3px #4A4A4A;
       border-radius:40px;
-      width:220px;
+      width:140px;
       overflow: hidden;
 
       .action{
@@ -123,4 +146,16 @@ input{
   padding:10px;
   font-size:1.25em;
   margin:10px 0px;
+}
+
+@media only screen and (max-width: 800px) {
+  #game-screen{
+    transform: scale(0.75);
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  #game-screen{
+    transform: scale(0.5);
+  }
 }

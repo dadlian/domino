@@ -12,6 +12,7 @@
       //Initialise default values for event updates, making fields read-only
       $data["code"] = $game->getCode();
       $data["type"] = $game->getType();
+      $data["playTo"] = $game->getPlayTo();
       $data["players"] = $game->getPlayers();
       $data["deck"] = $game->getDeck();
       $data["plays"] = $game->getPlays();
@@ -33,7 +34,7 @@
           shuffle($deck);
         }
 
-        $data["deck"] = $deck;
+        $data["deck"] = join(";",$deck);
       }
 
       //Reset plays if game has resumed

@@ -9,51 +9,61 @@ export class Game{
   public code: string;
   public status: string;
   public type: string;
-  public multiplayer: boolean;
-  public round: number;
-
-  public board: Board;
+  public playTo: number;
   public players: Array<Player>;
-  public activePlayed: boolean;
+  public board: Board;
 
   private _deck: Array<Domino>;
+  private _multiplayer: boolean;
+  private _activePlayed: boolean;
   private _activePlayer: number;
+  private _firstGame: boolean;
   private _plays: number;
   private _statusChange: Subject<string>;
   private _playMade: Subject<{domino: Domino, position: string}>;
-  private _firstGame: boolean;
+  private _auto: boolean;
 
   constructor(gameData: any, private _gameService: GameService){
+    //Initialise Public Variables
     this.self = "";
     this.code = "000000";
-    this.type = "Push";
     this.status = "Pending";
-    this.multiplayer = false;
-    this._deck = [];
-    this.round = 1;
+    this.type = "Push";
+    this.players = [];
+    this.deck = "";
+    this.playTo = 6;
 
-    for(let domino of gameData.deck){
-      this._deck.push(domino);
-    }
-    delete gameData.domino;
+    //Initialise active player
+    let shield = gameData.shield;
+    delete gameData.shield;
 
+    //Load Public Variable from arguments
+    let deck = gameData.deck;
+    delete gameData.players;
+    delete gameData.deck;
     Object.assign(this,gameData);
 
-    this.board = new Board();
-    this.players = [];
-    this.activePlayed = false;
+    //Load Active Player
+    this._activePlayer = shield;
 
-    this._activePlayer = 0;
+    //Load deck
+    this.deck = deck;
+
+    //Load Private Variables
+    this._firstGame = true;
+    this._auto = true;
+    this._multiplayer = false;
+    this.board = new Board();
     this._plays = 0;
     this._statusChange = new Subject<string>();
     this._playMade = new Subject<{domino: Domino, position: string}>();
-    this._firstGame = true;
+    this._activePlayed = false;
 
-    //Initialise _deck
-    if(this._deck.length == 0){
+    //Initialise deck
+    if(this.deck.length == 0){
       for(let i = 0; i < 7; i++){
         for(let j = i; j < 7; j++){
-          this._deck.push(new Domino(i,j));
+          this.deck.push(new Domino(i,j));
         }
       }
     }
@@ -64,13 +74,44 @@ export class Game{
     }
   }
 
+  get deck(): any{
+    return this._deck;
+  }
+
+  set deck(deckString: any){
+    let deck: Array<Domino> = [];
+    for(let domino of deckString.split(";")){
+      let values = domino.split(",");
+      deck.push(new Domino(parseInt(values[0]),parseInt(values[1])));
+    }
+
+    this._deck = deck;
+  }
+
+  set multiplayer(multiplayer: boolean){
+    this._multiplayer = multiplayer;
+  }
+
+  get activePlayer(): number{
+    return this._activePlayer;
+  }
+
+  set auto(auto: boolean){
+    this._auto = auto;
+  }
+
+  set firstGame(firstGame: boolean){
+    this._firstGame = firstGame;
+  }
+
   setPlayer(player: Player, index: number): boolean{
     if(this.players[index].human){
       return false;
     }else{
+      let hand = this.players[index].hand;
       Object.assign(this.players[index],player);
+      this.players[index].hand = hand;
       this.players[index].human = true;
-      this.players[index].role = "Jailman";
 
       if(this.seatsAvailable() == 0){
         this.start();
@@ -105,20 +146,19 @@ export class Game{
   }
 
   start(){
-    if(this.status !== "Playing"){
-      this.status = "Playing";
-      this._statusChange.next(this.status);
+    if(this.status == "Playing"){
+      return false;
     }
 
-    this.activePlayed = false;
+    this._activePlayed = false;
     this.board.center = null;
     this._plays = 0;
 
-    if(!this.multiplayer){
+    if(!this._multiplayer){
       this._shuffle(5);
     }
 
-    this._deal();
+    this.deal();
 
     //Let Double Six Pose for First Game
     if(this._firstGame){
@@ -132,16 +172,13 @@ export class Game{
       }
     }
 
-    if(!this.getActivePlayer().human){
-      setTimeout(() => {
-        this._aiTurn();
-      },1000)
-    }else if(this.getActivePlayer().remote){
-      this._gameService.getPlay();
-    }
+    this.status = "Playing";
+    this._statusChange.next(this.status);
+
+    this.waitForPlay();
   }
 
-  playLeft(domino: Domino): boolean{
+  playLeft(domino: Domino, notify: boolean = true): boolean{
     if(!this.canPlayLeft(domino)){
       return false;
     }
@@ -149,19 +186,19 @@ export class Game{
     let dominoIndex = this.players[this._activePlayer].hand.indexOf(domino);
     let validPlay = dominoIndex >= 0 && this.board.playLeft(domino);
     if(validPlay){
-      if(!this.getActivePlayer().remote){
+      if(notify){
         this._playMade.next({domino: domino, position: "left"});
       }
 
       this.players[this._activePlayer].hand.splice(dominoIndex,1);
-      this.activePlayed = true;
+      this._activePlayed = true;
       this._endTurn();
     }
 
     return validPlay;
   }
 
-  playRight(domino: Domino): boolean{
+  playRight(domino: Domino, notify: boolean = true): boolean{
     if(!this.canPlayRight(domino)){
       return false;
     }
@@ -169,21 +206,21 @@ export class Game{
     let dominoIndex = this.players[this._activePlayer].hand.indexOf(domino);
     let validPlay = dominoIndex >= 0 && this.board.playRight(domino);
     if(validPlay){
-      if(!this.getActivePlayer().remote){
+      if(notify){
         this._playMade.next({domino: domino, position: "right"});
       }
 
       this.players[this._activePlayer].hand.splice(dominoIndex,1);
-      this.activePlayed = true;
+      this._activePlayed = true;
       this._endTurn();
     }
 
     return validPlay;
   }
 
-  pass(): boolean{
+  pass(notify: boolean = true): boolean{
     if(this.canEndTurn()){
-      if(!this.getActivePlayer().remote){
+      if(notify){
         this._playMade.next({domino: null, position: "pass"});
       }
 
@@ -198,7 +235,7 @@ export class Game{
     if(this._firstGame && this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
-      return !this.activePlayed && this.board.canPlayLeft(domino);
+      return !this._activePlayed && this.board.canPlayLeft(domino);
     }
   }
 
@@ -206,12 +243,12 @@ export class Game{
     if(this._firstGame && this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
-      return !this.activePlayed && this.board.canPlayRight(domino);
+      return !this._activePlayed && this.board.canPlayRight(domino);
     }
   }
 
   canEndTurn(){
-    return this.activePlayed || this._getValidPlays(this.players[this._activePlayer]) == 0;
+    return this._activePlayed || this._getValidPlays(this.players[this._activePlayer]) == 0;
   }
 
   getActivePlayer(){
@@ -244,6 +281,24 @@ export class Game{
     return isWatching;
   }
 
+  isMultiplayer(): boolean{
+    return this._multiplayer;
+  }
+
+  waitForPlay(){
+    if(!this._auto){
+      return false;
+    }
+
+    if(!this.getActivePlayer().human){
+      setTimeout(() => {
+        this._aiTurn();
+      },1000)
+    }else if(this.getActivePlayer().remote){
+      this._gameService.getPlay();
+    }
+  }
+
   private _endTurn(){
     if(this.canEndTurn()){
       //Check if game is finished
@@ -259,23 +314,17 @@ export class Game{
         let playerCount = counts.filter(item => item == minCount).length;
         if(playerCount == 1){
           this._activePlayer = counts.indexOf(minCount);
-          this._endRound();
         }else{
           this.status = "Drawn";
-          this._statusChange.next(this.status);
         }
+
+        this._endRound();
       }else{
         this._activePlayer = (this._activePlayer + 1) % this.players.length;
-        this.activePlayed = false;
+        this._activePlayed = false;
         this._plays += 1;
 
-        if(!this.getActivePlayer().human){
-          setTimeout(() => {
-            this._aiTurn();
-          },1000)
-        }else if(this.getActivePlayer().remote){
-          this._gameService.getPlay();
-        }
+        this.waitForPlay();
       }
     }
   }
@@ -283,11 +332,12 @@ export class Game{
   private _endRound(){
     if(this.type == "Push"){
       this.status = "Completed";
-    }else{
-      this._firstGame = false;
-      this.status = "Intermission";
+    }else if(this.status !== "Drawn"){
       this.getActivePlayer().role = "Witness";
       this.getActivePlayer().score += 1;
+
+      this._firstGame = false;
+      this.status = "Intermission";
 
       //Check if everyone has come out of jail
       let squash: boolean = true;
@@ -298,7 +348,7 @@ export class Game{
       if(squash){
         this.status = "Squashed";
       //Check if the active player has jailed someone
-    }else if(this.getActivePlayer().score == 6){
+      }else if(this.getActivePlayer().score == this.playTo){
         this.status = "Victory";
         this.getActivePlayer().role = "Officer";
         let pusher = this.players[(this._activePlayer+3)%4];
@@ -328,28 +378,28 @@ export class Game{
       let j: number = 0;
       let candidate: Domino = null;
 
-      for (i = this._deck.length - 1; i > 0; i--){
+      for (i = this.deck.length - 1; i > 0; i--){
         j = Math.floor(Math.random() * (i + 1));
-        candidate = this._deck[i];
+        candidate = this.deck[i];
 
         //Reset Domino
         candidate.reset();
-        this._deck[i] = this._deck[j];
-        this._deck[j] = candidate;
+        this.deck[i] = this.deck[j];
+        this.deck[j] = candidate;
       }
     }
   }
 
-  private _deal(){
+  public deal(){
     //Empty player's hands
     for(let player of this.players){
       player.hand.length = 0;
     }
 
-    let cardsPerPlayer = Math.ceil(this._deck.length / this.players.length);
+    let cardsPerPlayer = Math.ceil(this.deck.length / this.players.length);
     for(let i = 0; i < cardsPerPlayer; i++){
       for(let j = 0; j < this.players.length; j++){
-        this.players[j].deal(this._deck[(i*this.players.length)+j])
+        this.players[j].deal(this.deck[(i*this.players.length)+j])
       }
     }
   }

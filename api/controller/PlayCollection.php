@@ -7,7 +7,7 @@
   class PlayCollection extends RestController{
     protected function get(){
       $game = $this->_retrieveResource();
-      $plays = explode(";",$game->getPlays());
+      $plays = $game->getPlays()?explode(";",$game->getPlays()):[];
       $payload = [
         "total" => sizeof($plays),
         "entries" => $plays
@@ -28,7 +28,8 @@
         ResponseHandler::bad("Please specify your play in a valid format.");
       }
 
-      $game->setPlays($game->getPlays().";$play");
+      $plays = $game->getPlays();
+      $game->setPlays($plays.($plays?";":"")."$play");
 
       $sqlGateway = new SQLGateway();
       $sqlGateway->save($game);

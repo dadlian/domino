@@ -42,9 +42,13 @@
   }
 }
 
-input{
+input,
+select{
   text-align:center;
   padding:10px;
   font-size:1.25em;
   margin:10px 0px;
+  width:90%;
+  background-color:#FFFFFF;
+  border:solid 1px #6A6A6A;
 }

@@ -5,15 +5,36 @@
       <div class='item' (click)="soloPlay()">Solo Play</div>
       <div class='item' (click)="multiplayer()">Multiplayer</div>
       <div class='item' (click)="joinModal.show()">Join Game</div>
-      <div class='item'>Options</div>
     </div>
   </div>
 </div>
+<jn-modal #setupModal>
+  <h1>Game Setup</h1>
+  <select [(ngModel)]="type">
+    <option value="">Select Game Type</option>
+    <option value="push">Push</option>
+    <option value="jail">Jail</option>
+  </select>
+  <select [(ngModel)]="playTo" [disabled]="type=='Push'">
+    <option value="">Games For Jail</option>
+    <option>1</option>
+    <option>2</option>
+    <option>3</option>
+    <option>4</option>
+    <option>5</option>
+    <option>6</option>
+  </select>
+  <div class='button-panel'>
+    <jn-button (click)="setupGame()" label="Start Game"></jn-button>
+    <jn-button (click)="setupModal.hide()" label="Cancel"></jn-button>
+  </div>
+</jn-modal>
 <jn-modal #joinModal>
   <h1>Enter Game Code</h1>
   <input [(ngModel)]="code" type='text' />
   <div class='button-panel'>
     <jn-button (click)="joinGame()" label="Join"></jn-button>
+    <jn-button (click)="joinModal.hide()" label="Cancel"></jn-button>
   </div>
 </jn-modal>
 <jn-modal #errorModal>
