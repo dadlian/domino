@@ -405,10 +405,16 @@ export class Game{
   }
 
   private _aiTurn(){
+    let played: boolean = false;
     for(let domino of this.getActivePlayer().hand){
       if(this.playLeft(domino) || this.playRight(domino)){
+        played = true;
         break;
       }
+    }
+
+    if(!played){
+      this.pass();
     }
   }
 }

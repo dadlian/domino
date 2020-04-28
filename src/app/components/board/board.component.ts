@@ -25,7 +25,6 @@ export class BoardComponent{
   }
 
   ngAfterViewInit(){
-    this.canvas.nativeElement.style.width = "25px";
   }
 
   reset(){
@@ -33,10 +32,6 @@ export class BoardComponent{
     this.rightFull = false;
     this.upFull = false;
     this.downFull = false;
-
-    if(this.canvas){
-      this.canvas.nativeElement.style.width = "25px";
-    }
   }
 
   getLeftDominos(){
@@ -63,11 +58,6 @@ export class BoardComponent{
     if(this.canvas && this.left && this.right){
       this.canvas.nativeElement.style.marginLeft = (this.right.nativeElement.offsetWidth- this.left.nativeElement.offsetWidth)+"px";
     }
-
-    if(leftDominos.length > 0){
-      this.canvas.nativeElement.style.width = "auto";
-    }
-
     return leftDominos;
   }
 
@@ -94,10 +84,6 @@ export class BoardComponent{
 
     if(this.canvas && this.left && this.right){
       this.canvas.nativeElement.style.marginLeft = (this.right.nativeElement.offsetWidth- this.left.nativeElement.offsetWidth)+"px";
-    }
-
-    if(rightDominos.length > 0){
-      this.canvas.nativeElement.style.width = "auto";
     }
 
     return rightDominos;

@@ -2,134 +2,123 @@
   display:flex;
   align-items: center;
   flex-direction: column;
-  padding-top:20px;
-  width:100vw;
+  width:100%;
   position:relative;
 
   jn-player{
-    width:480px;
     position: absolute;
-  }
-
-  .top-row{
-    display: flex;
-    justify-content: center;
-    position: absolute;
-    top:25px;
-    height:70px;
-  }
-
-  .bottom-row{
-    display: flex;
-    justify-content: center;
-    position: absolute;
-    bottom:15px;
-    height:70px;
-  }
-
-  .middle-row{
-    display: flex;
-    align-items: center;
-    position:relative;
-
-    jn-player.left{
-      left:-195px;
-    }
-
-    jn-player.right{
-      right:-195px;
-    }
-
-    .status-dial{
-      position:absolute;
-      bottom:10px;
-      left:10px;
-      height:125px;
-      width:125px;
-      border-radius:75px;
-      border:solid 1px #161616;
-      background-color:#949494;
-      display:flex;
-      justify-content: center;
-      align-items: center;
-
-      .status{
-        cursor:pointer;
-        display:flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height:100px;
-        width:100px;
-        border-radius:65px;
-        background-color:#161616;
-        opacity:0.8;
-
-        span{
-          text-align: center;
-          width:100px;
-          color:#D5DAD7;
-          font-style:italic;
-          color:#DDDDDD;
-        }
-
-        span:last-child{
-          margin-top:5px;
-          color:#FFFFFF;
-          font-size:1.15em;
-        }
-      }
-
-      .status.active{
-        color:#FFFFFF;
-        opacity:1;
-      }
-    }
-
-    .action-panel{
-      position:absolute;
-      bottom:15px;
-      right:15px;
-      display:flex;
-      border:solid 3px #4A4A4A;
-      border-radius:40px;
-      width:140px;
-      overflow: hidden;
-
-      .action{
-        background-color:#161616;
-        width:110px;
-        text-align: center;
-        padding:10px;
-        border-left:solid 1px #4A4A4A;
-        border-right:solid 1px #4A4A4A;
-        cursor:pointer;
-        color:#AAAAAA;
-        opacity:0.8;
-        font-weight:bold;
-      }
-
-      .action.active{
-        color:#FFFFFF;
-        opacity:1;
-      }
-
-      .action:last-child{
-        padding-right:15px;
-      }
-    }
-  }
-
-  .bottom-row{
-  }
-
-  jn-player{
     opacity:0.7;
     z-index:100;
   }
 
+  jn-player.top{
+    top:0px;
+  }
+
+  jn-player.left{
+    top:calc(50vh - 37.5px);
+    left:-45px;
+  }
+
+  jn-player.right{
+    top:calc(50vh - 37.5px);
+    right:-45px;
+  }
+
+  .active-player{
+    position:absolute;
+    bottom:10px;
+    right:10px;
+
+    jn-player{
+      position:static;
+    }
+
+    .hand{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height:50px;
+      margin-bottom:10px;
+
+      jn-domino{
+        transform:rotate(90deg);
+        margin:0px -10px;
+      }
+
+      jn-domino.active{
+        margin-top:-50px;
+      }
+    }
+  }
+
   jn-player.active{
     opacity:1;
+  }
+
+  .status-dial{
+    position:absolute;
+    bottom:5px;
+    left:5px;
+    height:120px;
+    width:120px;
+    border-radius:60px;
+    border:solid 1px #161616;
+    background-color:#949494;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    .status{
+      cursor:pointer;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+      height:100px;
+      width:100px;
+      border-radius:65px;
+      background-color:#161616;
+      opacity:0.8;
+
+      span{
+        text-align: center;
+        width:100px;
+        color:#D5DAD7;
+        font-style:italic;
+        margin-top:5px;
+        color:#FFFFFF;
+        font-size:1.15em;
+      }
+
+      .border{
+        background-color:#949494;
+        height:100%;
+        width:2px;
+      }
+
+      .play{
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        height:100%;
+        width:calc(50% - 1px);
+        opacity:0.5;
+
+        img{
+          height:25px;
+          width:25px;
+        }
+      }
+
+      div.active{
+        opacity:1;
+      }
+    }
+
+    .status.active{
+      color:#FFFFFF;
+      opacity:1;
+    }
   }
 }
 
@@ -146,16 +135,4 @@ input{
   padding:10px;
   font-size:1.25em;
   margin:10px 0px;
-}
-
-@media only screen and (max-width: 800px) {
-  #game-screen{
-    transform: scale(0.75);
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  #game-screen{
-    transform: scale(0.5);
-  }
 }

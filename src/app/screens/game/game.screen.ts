@@ -32,6 +32,13 @@ export class GameScreen{
   ngOnInit(){
     this.game = this._gameService.getCurrentGame();
     this.joinModal.show()
+    this.player.name = "Sven";
+    this.join();
+    this.game.start();
+    setTimeout(() => {
+      this.joinModal.hide();
+      this.statusModal.hide();
+    },100)
 
     this.game.statusChanged().subscribe(status => {
       switch(status){

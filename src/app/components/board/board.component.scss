@@ -3,12 +3,123 @@
   background-position: top left;
   background-repeat: no-repeat;
   background-size: cover;
-  width:800px;
-  height:750px;
+  width:100%;
+  height:100vh;
   display:flex;
   justify-content: center;
   align-items: center;
-  position:relative;
+
+  .jn-board{
+    width:100%;
+    height:435px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    .left-column{
+      height:100%;
+
+      .left{
+        width:50px;
+        height:100%;
+        border:solid 2px black;
+      }
+    }
+
+    .left-connector-column{
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width:50px;
+      height:100%;
+
+      .bottom{
+        width:50px;
+        height:25px;
+        border:solid 2px black;
+      }
+    }
+
+    .middle-column{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width:50px;
+
+      .up{
+        width:50px;
+        max-height:calc(50vh - 80px);
+        height:250px;
+        border:solid 2px black;
+      }
+
+      .center{
+        width:50px;
+        height:25px;
+        border:solid 2px black;
+        margin:0 auto;
+
+        jn-domino{
+          transform:rotate(180deg);
+        }
+      }
+
+      .down{
+        width:50px;
+        height:calc(50vh - 150px);
+        border:solid 2px black;
+      }
+    }
+
+    .right-connector-column{
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      width:50px;
+      height:100%;
+
+      .top{
+        width:50px;
+        height:25px;
+        border:solid 2px black;
+      }
+    }
+
+    .right-column{
+      height:100%;
+
+      .right{
+        width:50px;
+        height:100%;
+        border:solid 2px black;
+      }
+    }
+  }
+
+  .right{
+    height:100px;
+    width:50px;
+    border:solid 2px black;
+  }
+
+  .second-row{
+    display: flex;
+    flex-direction: row-reverse;
+    border:solid 2px black;
+    justify-content: flex-end;
+
+    .bottom{
+      width:50px;
+      height:25px;
+      border:solid 2px black;
+    }
+
+    .left{
+      height:100px;
+      width:50px;
+      border:solid 2px black;
+    }
+  }
 
   .top-row{
     width:100%;
@@ -87,22 +198,6 @@
 
     .right{
       flex-direction: row;
-    }
-
-    .center{
-      width:50px;
-      height:50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .center.double{
-      width:25px;
-
-      jn-domino{
-        transform:rotate(90deg);
-      }
     }
   }
 

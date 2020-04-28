@@ -1,24 +1,26 @@
 <div id='game-screen'>
-  <div class='top-row'>
-    <jn-player [player]='game.players[(viewPoint + 2) % 4]' [showHand]="game.isShut()" [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 2) % 4]}" position="top"></jn-player>
-  </div>
-  <div class='middle-row'>
-    <jn-player [player]='game.players[(viewPoint+3) % 4]' [showHand]="game.isShut()" position='left' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 3) % 4]}" position="left"></jn-player>
-    <jn-board [board]="game.board"></jn-board>
-    <jn-player [player]='game.players[(viewPoint+1) % 4]' [showHand]="game.isShut()" position='right' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}" position="right"></jn-player>
-    <div *ngIf="!game.isWatching()" class='status-dial'>
-      <div class='status' (click)="pass()" [ngClass]="{active:myTurn() && game.canEndTurn()}">
-        <span>Turn {{game.turn}}</span>
-        <span>{{myTurn()?'Wrap':'Waiting for '+game.getActivePlayer()?.name}}</span>
-      </div>
+  <jn-player [player]='game.players[(viewPoint + 2) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 2) % 4]}" position="top"></jn-player>
+  <jn-player [player]='game.players[(viewPoint+3) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 3) % 4]}" position="left"></jn-player>
+  <jn-board [board]="game.board"></jn-board>
+  <jn-player [player]='game.players[(viewPoint+1) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}" position="right"></jn-player>
+  <div *ngIf="!game.isWatching()" class='status-dial'>
+    <div *ngIf="!myTurn()" class='status'>
+      <span>Waiting for {{game.getActivePlayer()?.name}}</span>
     </div>
-    <div *ngIf="!game.isWatching()" class='action-panel'>
-      <div class='action' [ngClass]="{active:canPlayLeft()}" (click)="playLeft()">Left</div>
-      <div class='action' [ngClass]="{active:canPlayRight()}" (click)="playRight()">Right</div>
+    <div *ngIf="myTurn() && game.canEndTurn()" class='status active' (click)="pass()">
+      <img src='assets/knock.png' />
+    </div>
+    <div *ngIf="myTurn() && !game.canEndTurn()" class='status active'>
+      <div class='play' (click)="playLeft()" [ngClass]="{active: canPlayLeft()}"><img src='assets/left-arrow.png' /></div>
+      <div class='border'></div>
+      <div class='play' (click)="playRight()" [ngClass]="{active: canPlayRight()}"><img src='assets/right-arrow.png' /></div>
     </div>
   </div>
-  <div class='bottom-row'>
-    <jn-player [player]='game.players[viewPoint]' [showHand]="true" position='bottom' [active]="activeDomino" (pickDomino)="selectDomino($event)" [ngClass]="{active:game.getActivePlayer() == game.players[viewPoint]}" position="bottom"></jn-player>
+  <div class='active-player'>
+    <div class='hand'>
+      <jn-domino *ngFor="let domino of game.players[viewPoint]?.hand" [domino]="domino" (click)="selectDomino(domino)" [ngClass]="{'active':domino == activeDomino}"></jn-domino>
+    </div>
+    <jn-player [player]='game.players[viewPoint]' [ngClass]="{active:game.getActivePlayer() == game.players[viewPoint]}" position="bottom"></jn-player>
   </div>
 </div>
 <jn-modal #joinModal [hidden]="game.seatsAvailable() == 0">

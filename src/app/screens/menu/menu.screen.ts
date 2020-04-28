@@ -21,9 +21,15 @@ export class MenuScreen{
   constructor(private _router: Router, private _gameService: GameService){
     this.code = "";
     this.type = "";
-    this.playTo = "";
+    this.playTo = "1";
 
     this._mode = "";
+  }
+
+  ngOnInit(){
+    this._mode = "solo";
+    this.type = "push";
+    this.setupGame();
   }
 
 

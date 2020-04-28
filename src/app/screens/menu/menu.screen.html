@@ -15,7 +15,7 @@
     <option value="push">Push</option>
     <option value="jail">Jail</option>
   </select>
-  <select [(ngModel)]="playTo" [disabled]="type=='Push'">
+  <select [(ngModel)]="playTo" *ngIf="type=='jail'">
     <option value="">Games For Jail</option>
     <option>1</option>
     <option>2</option>
