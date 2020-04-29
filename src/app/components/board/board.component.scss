@@ -1,27 +1,25 @@
 :host{
-  background-image: url('../../../assets/board.png');
   background-position: top left;
   background-repeat: no-repeat;
   background-size: cover;
-  width:100%;
-  height:100vh;
+  margin-top:55px;
+  width:250px;
+  height:calc(100vh - 185px);
   display:flex;
   justify-content: center;
   align-items: center;
 
   .jn-board{
     width:100%;
-    height:435px;
     display:flex;
     justify-content: center;
     align-items: center;
 
     .left-column{
-      height:100%;
+      align-self:flex-end;
 
       .left{
         width:50px;
-        height:100%;
         border:solid 2px black;
       }
     }
@@ -32,6 +30,7 @@
       justify-content: flex-end;
       width:50px;
       height:100%;
+      align-self:flex-end;
 
       .bottom{
         width:50px;
@@ -48,9 +47,23 @@
 
       .up{
         width:50px;
-        max-height:calc(50vh - 80px);
-        height:250px;
         border:solid 2px black;
+        display:flex;
+        flex-direction: column-reverse;
+
+        jn-domino{
+          transform:rotate(270deg);
+          margin:12px 0px;
+        }
+
+        jn-domino.double{
+          transform:rotate(180deg);
+          margin:0px;
+        }
+
+        jn-domino.inverted{
+          transform:rotate(90deg);
+        }
       }
 
       .center{
@@ -66,8 +79,28 @@
 
       .down{
         width:50px;
-        height:calc(50vh - 150px);
         border:solid 2px black;
+        display:flex;
+        flex-direction: column;
+
+        jn-domino{
+          transform:rotate(270deg);
+          margin:12px 0px;
+        }
+
+        jn-domino.double{
+          transform:rotate(0deg);
+          margin:0px;
+        }
+
+        jn-domino.inverted{
+          transform:rotate(90deg);
+        }
+
+        jn-domino.double.inverted{
+          transform:rotate(180deg);
+          margin:0px;
+        }
       }
     }
 
@@ -77,6 +110,7 @@
       justify-content: flex-start;
       width:50px;
       height:100%;
+      align-self:flex-start;
 
       .top{
         width:50px;
@@ -86,6 +120,7 @@
     }
 
     .right-column{
+      align-self:flex-start;
       height:100%;
 
       .right{

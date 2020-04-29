@@ -1,13 +1,13 @@
 <div class='jn-player'>
   <div class='status'>
+    <div class='score'>
+      <div class='point' *ngFor="let point of getPoints()"></div>
+    </div>
     <div class='profile'>
       <div class='details'>
         <div class='name'>{{player.name}} ({{player.hand.length}} left)</div>
         <div class='role'>{{player.role}}</div>
       </div>
-    </div>
-    <div class='score'>
-      <div class='point' *ngFor="let point of getPoints()"></div>
     </div>
   </div>
 </div>

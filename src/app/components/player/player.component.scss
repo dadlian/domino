@@ -7,13 +7,16 @@
     align-items: flex-end;
 
     .status{
+      display:flex;
+      align-items: center;
+
       .score{
         display: flex;
-        justify-content: flex-end;
+        flex-wrap: wrap;
+        width:50px;
+        height:30px;
         margin:0 auto;
-        width:110px;
-        height:10px;
-        margin-bottom:-8px;
+        margin-right:10px;
 
         .point{
           width:10px;
@@ -21,9 +24,10 @@
           border-radius:5px;
           background-color: #000000;
           margin-right:10px;
+          margin-bottom:10px;
         }
 
-        .point:last-child{
+        .point:nth-child(3n){
           margin-right:0px;
         }
       }

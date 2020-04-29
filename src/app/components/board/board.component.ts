@@ -8,86 +8,90 @@ import { Board } from '../../model/board.model';
 })
 export class BoardComponent{
   @ViewChild("canvas",{static:false}) canvas: ElementRef;
-  @ViewChild("left",{static:false}) left: ElementRef;
-  @ViewChild("right",{static:false}) right: ElementRef;
   @ViewChild("up",{static:false}) up: ElementRef;
   @ViewChild("down",{static:false}) down: ElementRef;
 
   @Input() board: Board;
-  public leftFull: boolean;
-  public rightFull: boolean;
   public upFull: boolean;
   public downFull: boolean;
+
+  private _verticalCapacity: number;
 
   constructor(){
     this.board = new Board();
     this.reset();
+    this._verticalCapacity = 0;
   }
 
   ngAfterViewInit(){
+    this._verticalCapacity = (window.innerHeight - 185)/2 - 25;
+    console.log(this._verticalCapacity);
   }
 
   reset(){
-    this.leftFull = false;
-    this.rightFull = false;
     this.upFull = false;
     this.downFull = false;
   }
 
-  getLeftDominos(){
-    let width = 0;
-    let leftDominos = [];
-
-    let currentDomino = this.board.center;
-    while(currentDomino && currentDomino.previous){
-      leftDominos.push(currentDomino.previous);
-      if(currentDomino.previous.isDouble()){
-        width += 25;
-      }else{
-        width += 50;
-      }
-
-      if(width > 225 && (currentDomino.previous.isDouble() || !currentDomino.isDouble())){
-        this.leftFull = true;
-        break;
-      }
-
-      currentDomino = currentDomino.previous;
-    }
-
-    if(this.canvas && this.left && this.right){
-      this.canvas.nativeElement.style.marginLeft = (this.right.nativeElement.offsetWidth- this.left.nativeElement.offsetWidth)+"px";
-    }
-    return leftDominos;
-  }
-
-  getRightDominos(){
-    let width = 0;
-    let rightDominos = [];
+  getUpDominos(){
+    let height = 0;
+    let upDominos = [];
 
     let currentDomino = this.board.center;
     while(currentDomino && currentDomino.next){
-      rightDominos.push(currentDomino.next);
       if(currentDomino.next.isDouble()){
-        width += 25;
+        height += 25;
       }else{
-        width += 50;
+        height += 50;
       }
 
-      if(width > 225 && (currentDomino.next.isDouble() || !currentDomino.isDouble())){
-        this.rightFull = true;
+      if(height <= this._verticalCapacity){
+        upDominos.push(currentDomino.next);
+      }else{
+        this.upFull = true;
         break;
       }
 
       currentDomino = currentDomino.next;
     }
 
-    if(this.canvas && this.left && this.right){
-      this.canvas.nativeElement.style.marginLeft = (this.right.nativeElement.offsetWidth- this.left.nativeElement.offsetWidth)+"px";
+    if(this.canvas && this.up && this.down){
+      this.canvas.nativeElement.style.marginBottom = (this.up.nativeElement.offsetHeight - this.down.nativeElement.offsetHeight)+"px";
     }
 
-    return rightDominos;
+    return upDominos;
   }
+
+  getDownDominos(){
+    let height = 0;
+    let downDominos = [];
+
+    let currentDomino = this.board.center;
+    while(currentDomino && currentDomino.previous){
+      if(currentDomino.previous.isDouble()){
+        height += 25;
+      }else{
+        height += 50;
+      }
+
+      if(height <= this._verticalCapacity){
+        downDominos.push(currentDomino.previous);
+      }else{
+        this.upFull = true;
+        break;
+      }
+
+      currentDomino = currentDomino.previous;
+    }
+
+    if(this.canvas && this.up && this.down){
+      this.canvas.nativeElement.style.marginBottom = (this.up.nativeElement.offsetHeight - this.down.nativeElement.offsetHeight)+"px";
+    }
+
+    return downDominos;
+  }
+
+  /*
 
   getUpDominos(){
     let width = 0;
@@ -187,5 +191,5 @@ export class BoardComponent{
     }
 
     return bottomDominos;
-  }
+  }*/
 }
