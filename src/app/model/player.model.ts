@@ -22,7 +22,6 @@ export class Player{
     this.hand = [];
 
     Object.assign(this,playerData);
-    this.score = 6;
   }
 
   deal(domino: Domino){

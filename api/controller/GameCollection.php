@@ -76,6 +76,10 @@
       $data["firstGame"] = true;
       $data["shield"] = 0;
 
+      if(array_key_exists("type",$data) && $data["type"] == "push"){
+        $data["playTo"] = 1;
+      }
+
       $game->build($data);
       if(!$game->hasBuildErrors()){
         $sqlGateway = new SQLGateway();

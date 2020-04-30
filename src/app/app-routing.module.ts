@@ -8,7 +8,7 @@ const routes: Routes = [
     path: "",
     children:[
       {
-        path: 'menu',
+        path: '',
         loadChildren: "./screens/menu/menu.module#MenuScreenModule"
       },
       {
@@ -19,7 +19,7 @@ const routes: Routes = [
       {
         path: "",
         pathMatch: "full",
-        redirectTo: "menu"
+        redirectTo: ""
       },
       {
         path: "**",

@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalComponent } from '../../components/components.module';
+import { FullScreenService } from '../../services/fullscreen.service';
 import { GameService } from '../../services/game.service';
 
 @Component({
@@ -18,18 +19,15 @@ export class MenuScreen{
 
   private _mode: string;
 
-  constructor(private _router: Router, private _gameService: GameService){
+  constructor(private _router: Router, private _gameService: GameService, private _fullScreenService: FullScreenService){
     this.code = "";
     this.type = "";
-    this.playTo = "1";
+    this.playTo = "";
 
     this._mode = "";
   }
 
   ngOnInit(){
-    this._mode = "solo";
-    this.type = "push";
-    this.setupGame();
   }
 
 
@@ -44,17 +42,19 @@ export class MenuScreen{
   }
 
   setupGame(){
-    if(!this.type || !this.playTo){
+    if(!this.type || (this.type == "jail" && !this.playTo)){
       return;
     }
 
     if(this._mode == "solo"){
       if(this._gameService.startSolo(this.type,parseInt(this.playTo))){
+        this._fullScreenService.openFullScreen();
         this._router.navigate(["/game"]);
       }
     }else if(this._mode == "multiplayer"){
       this._gameService.startMultiplayer(this.type,parseInt(this.playTo)).then(result => {
         if(result){
+          this._fullScreenService.openFullScreen();
           this._router.navigate(["/game"]);
         }
       })

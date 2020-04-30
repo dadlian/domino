@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BoardComponent, ModalComponent, SummaryComponent } from '../../components/components.module';
+import { FullScreenService } from '../../services/fullscreen.service';
 import { GameService } from '../../services/game.service';
 import { Game } from '../../model/game.model';
 import { Domino } from '../../model/domino.model';
@@ -21,7 +22,7 @@ export class GameScreen{
   public viewPoint: number;
   public timer: number;
 
-  constructor(private _router: Router, private _gameService: GameService){
+  constructor(private _router: Router, private _gameService: GameService, private _fullScreenService: FullScreenService){
     this.game = null;
     this.player = new Player({});
     this.activeDomino = null;
@@ -31,14 +32,7 @@ export class GameScreen{
 
   ngOnInit(){
     this.game = this._gameService.getCurrentGame();
-    this.joinModal.show()
-    this.player.name = "Sven";
-    this.join();
-    this.game.start();
-    setTimeout(() => {
-      this.joinModal.hide();
-      this.statusModal.hide();
-    },100)
+    this.joinModal.show();
 
     this.game.statusChanged().subscribe(status => {
       switch(status){
@@ -59,13 +53,14 @@ export class GameScreen{
 
           break;
         case "Completed":
-          this.statusModal.show();
-          break;
         case "Victory":
-          this.summary.show();
-          break;
         case "Squashed":
-          this.summary.show();
+          if(this.game.type == "jail"){
+            this.summary.show();
+          }else{
+            this.statusModal.show();
+          }
+
           break;
       }
     })
@@ -118,7 +113,7 @@ export class GameScreen{
   }
 
   mainMenu(){
-    this._router.navigate(["/menu"]);
+    this._router.navigate(["/"]);
   }
 
   canPlayLeft(){
@@ -131,6 +126,12 @@ export class GameScreen{
 
   myTurn(){
     return this.game.players[this.viewPoint] == this.game.getActivePlayer();
+  }
+
+  exit(){
+    console.log("Exit")
+    this._fullScreenService.closeFullScreen();
+    this._router.navigate(["/"]);
   }
 
   private _continueGame(){

@@ -9,7 +9,7 @@ import { Game } from '../../model/game.model';
 export class SummaryComponent{
   @Input() game: Game;
   public visible: boolean;
-  public summary: Array<{name: string, points: number, officer: number, witness: number, bonus: number, push: number, face: number, antiman: number}>;
+  public summary: Array<{name: string, points: number, breakdown: string}>;
 
   constructor(){
     this.game = null;
@@ -33,41 +33,41 @@ export class SummaryComponent{
 
   private _generateSummary(){
     for(let i = 0; i < this.game.players.length; i++){
-      let score = {name: "", points: 0, officer: 0, witness: 0, bonus: 0, push: 0, face: 0, antiman: 0}
+      let score = {name: "", points: 0, breakdown: ""}
       let player = this.game.players[i];
       score.name = player.role+" "+player.name;
 
       if(player.role == "Officer"){
         score.points += 3;
-        score.officer = 3;
+        score.breakdown += "3 (Officer)";
 
         //Check for antiman bonus
         if(this.game.players[(i+3)%4].role == "Antiman"){
           score.points += 1;
-          score.bonus = 1;
+          score.breakdown += " + 1 (Bonus)";
         }
       }
 
       if(player.role == "Witness"){
         score.points += 1;
-        score.witness = 1;
+        score.breakdown += "1 (Witness)";
       }
 
       if(player.role == "Jailman"){
         //Check for push
         if(this.game.players[(i+3)%4].role == "Officer"){
           score.points -= 1;
-          score.push = -1;
+          score.breakdown += "-1 (Push)";
         //Check for face
         }else if(this.game.players[(i+2)%4].role == "Officer"){
           score.points -= 2;
-          score.face = -2;
+          score.breakdown += "-2 (Face)";
         }
       }
 
       if(player.role == "Antiman"){
         score.points -= 3;
-        score.antiman = -3;
+        score.breakdown += "-3 (Antiman)";
       }
 
       this.summary.push(score);

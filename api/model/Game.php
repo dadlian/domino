@@ -20,7 +20,7 @@
     /** @WadapiString(pattern="^([0-9],[0-9];?){28}$") */
     public $deck;
 
-    /** @WadapiString(pattern="^([0-9],[0-9],(left|right|pass);?)*$") */
+    /** @WadapiString(pattern="^([0-9],[0-9][0-9]?,(left|right|pass);?)*$") */
     public $plays;
 
     /** @Integer(required=true) */

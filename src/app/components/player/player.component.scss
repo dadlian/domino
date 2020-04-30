@@ -12,6 +12,7 @@
 
       .score{
         display: flex;
+        flex-direction: row-reverse;
         flex-wrap: wrap;
         width:50px;
         height:30px;
@@ -46,6 +47,7 @@
           border-radius:40px;
           color:#FFFFFF;
           background-color:#161616;
+          padding:7px 0px;
 
           div{
             text-align:center;
@@ -54,7 +56,6 @@
           }
 
           .name{
-            border-bottom: solid 1px #6A6A6A;
             font-weight:bold;
           }
 

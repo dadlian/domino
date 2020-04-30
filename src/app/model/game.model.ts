@@ -69,8 +69,17 @@ export class Game{
     }
 
     //Initialise 4 AI Players
-    for(let i = 1; i <= 4; i++){
-      this.players.push(new Player({name: `AI ${i}`,role: (this.type == 'Push')?"Player":"Jailman"}));
+    let ais = ["T-1000","Wall-E","C-3PO","R2-D2","Rosie","Optimus","Megatron","HAL","Bender","Watson","ASIMO","Robocop","Fembot",
+                "Ultron","Vision","Megazord","Cyrax","Data","Calculon","KITT","J.A.R.V.I.S","F.R.I.D.A.Y","R.O.B"];
+
+    let seed = 0;
+    for(let letter of this.code){
+      seed += letter.charCodeAt(0);
+    }
+    seed = seed % ais.length;
+
+    for(let i = 0; i < 4; i++){
+      this.players.push(new Player({name: `${ais.splice(seed+4*i,1)[0]}`,role: (this.type == 'Push')?"Player":"Jailman"}));
     }
   }
 
@@ -232,6 +241,10 @@ export class Game{
   }
 
   canPlayLeft(domino: Domino){
+    if(!domino){
+      return false;
+    }
+
     if(this._firstGame && this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
@@ -240,6 +253,10 @@ export class Game{
   }
 
   canPlayRight(domino: Domino){
+    if(!domino){
+      return false;
+    }
+
     if(this._firstGame && this._plays == 0){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
@@ -330,7 +347,7 @@ export class Game{
   }
 
   private _endRound(){
-    if(this.type == "Push"){
+    if(this.type == "push"){
       this.status = "Completed";
     }else if(this.status !== "Drawn"){
       this.getActivePlayer().role = "Witness";

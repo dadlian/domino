@@ -104,6 +104,11 @@ export class GameService{
           this._currentGame.setPlayer(player, player.position);
           this._activePlayers[player.id] = player;
           this._heartbeat(player.position);
+
+          if(this._currentGame.status == "Pending"){
+            this._waitForStart();
+          }
+
           resolve(player.position);
         })
       }else{
@@ -124,9 +129,13 @@ export class GameService{
     let subscription = poll.subscribe((response: any) => {
       if(response.total > this._plays.length){
         let newPlays = response.entries;
+        let success: boolean = true;
         for(let i = this._plays.length; i < newPlays.length; i++){
           let play = newPlays[i];
-          this._plays.push(play)
+
+          if(this._plays.indexOf(play) < 0){
+            this._plays.push(play)
+          }
 
           let playParts = play.split(",");
           let position = playParts[2];
@@ -140,15 +149,17 @@ export class GameService{
           }
 
           if(position == "pass"){
-            this._currentGame.pass(false);
+            success = success && this._currentGame.pass(false);
           }else if(position == "left"){
-            this._currentGame.playLeft(activeDomino,false)
+            success = success && this._currentGame.playLeft(activeDomino,false)
           }else if(position == "right"){
-            this._currentGame.playRight(activeDomino,false)
+            success = success && this._currentGame.playRight(activeDomino,false)
           }
         }
 
-        subscription.unsubscribe();
+        if(success){
+          subscription.unsubscribe();
+        }
       }
     })
   }
@@ -185,7 +196,7 @@ export class GameService{
     //Listen for plays
     this._currentGame.playMade().subscribe(play => {
       if(play.position == "pass"){
-        this._addPlay("0,0,pass");
+        this._addPlay(this._currentGame.activePlayer+","+this._plays.length+",pass");
       }else{
         this._addPlay(`${play.domino.value[0]},${play.domino.value[1]},${play.position}`);
       }
@@ -220,7 +231,10 @@ export class GameService{
           this._currentGame.auto = false;
           for(let i = 0; i < response.total; i++){
             let play = response.entries[i];
-            this._plays.push(play)
+
+            if(this._plays.indexOf(play) < 0){
+              this._plays.push(play)
+            }
 
             let playParts = play.split(",");
             let position = playParts[2];
@@ -282,6 +296,20 @@ export class GameService{
     })
   }
 
+  private _waitForStart(){
+    let gameUpdate = this._httpClient.get(this._root+this._currentGame.self);
+    let updateGate = timer(0,5000).pipe(
+      concatMap(_ => gameUpdate),
+      map(response => response)
+    )
+
+    updateGate.subscribe((game: any) => {
+      if(game.status == "Playing"){
+        this._currentGame.start();
+      }
+    })
+  }
+
   private _saveGame(): Promise<any>{
     return new Promise<any>((resolve, reject) => {
       let status = this._currentGame.status;
@@ -302,8 +330,9 @@ export class GameService{
   }
 
   private _addPlay(play: string){
-    this._plays.push(play);
-    this._httpClient.post(this._root+this._currentGame.self+"/plays",{play:play}).subscribe(result => {
-    })
+    if(this._plays.indexOf(play) < 0){
+      this._plays.push(play)
+      this._httpClient.post(this._root+this._currentGame.self+"/plays",{play:play}).subscribe(result => {})
+    }
   }
 }

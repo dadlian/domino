@@ -6,6 +6,13 @@
   height:100%;
   position:relative;
 
+  .close{
+    position: absolute;
+    top:10px;
+    right:10px;
+    cursor:pointer;
+  }
+
   jn-player{
     position: absolute;
     opacity:0.7;
@@ -13,24 +20,25 @@
   }
 
   jn-player.top{
-    top:0px;
+    top:2px;
+    margin-left:-25px;
   }
 
   jn-player.left{
     top:calc(50vh - 37.5px);
-    left:-77px;
+    left:-82.5px;
     margin-top:30px;
   }
 
   jn-player.right{
     top:calc(50vh - 37.5px);
-    right:-77px;
+    right:-82.5px;
     margin-top:-30px;
   }
 
   .active-player{
     position:absolute;
-    bottom:10px;
+    bottom:5px;
     right:10px;
 
     jn-player{
@@ -42,7 +50,7 @@
       justify-content: center;
       align-items: center;
       height:50px;
-      margin-bottom:10px;
+      margin-bottom:5px;
 
       jn-domino{
         transform:rotate(90deg);
@@ -63,9 +71,9 @@
     position:absolute;
     bottom:5px;
     left:5px;
-    height:120px;
-    width:120px;
-    border-radius:60px;
+    height:105px;
+    width:105px;
+    border-radius:52.5px;
     border:solid 1px #161616;
     background-color:#949494;
     display:flex;
@@ -75,28 +83,28 @@
     .status{
       cursor:pointer;
       display:flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height:100px;
-      width:100px;
-      border-radius:65px;
+      height:90px;
+      width:90px;
+      border-radius:45px;
       background-color:#161616;
       opacity:0.8;
 
       span{
         text-align: center;
-        width:100px;
+        width:90px;
         color:#D5DAD7;
         font-style:italic;
         margin-top:5px;
         color:#FFFFFF;
-        font-size:1.15em;
       }
 
       .border{
         background-color:#949494;
-        height:100%;
-        width:2px;
+        height:2px;
+        width:100%;
       }
 
       .play{
@@ -105,12 +113,22 @@
         align-items: center;
         height:100%;
         width:calc(50% - 1px);
-        opacity:0.5;
 
         img{
-          height:25px;
-          width:25px;
+          height:30px;
+          width:30px;
         }
+      }
+
+      .noplay{
+        img{
+          height:40px;
+          width:40px;
+        }
+      }
+
+      .instruction{
+        text-align: center;
       }
 
       div.active{
@@ -123,6 +141,10 @@
       opacity:1;
     }
   }
+}
+
+.game-code{
+  margin-bottom:15px;
 }
 
 .button-panel{

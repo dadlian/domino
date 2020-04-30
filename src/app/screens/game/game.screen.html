@@ -1,4 +1,5 @@
 <div id='game-screen'>
+  <div class='close' (click)="exit()"><img src='assets/close.png' alt='close' /></div>
   <jn-player [player]='game.players[(viewPoint + 2) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 2) % 4]}" position="top"></jn-player>
   <jn-player [player]='game.players[(viewPoint+3) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 3) % 4]}" position="left"></jn-player>
   <jn-board [board]="game.board"></jn-board>
@@ -11,9 +12,11 @@
       <img src='assets/knock.png' />
     </div>
     <div *ngIf="myTurn() && !game.canEndTurn()" class='status active'>
-      <div class='play' (click)="playLeft()" [ngClass]="{active: canPlayLeft()}"><img src='assets/left-arrow.png' /></div>
-      <div class='border'></div>
-      <div class='play' (click)="playRight()" [ngClass]="{active: canPlayRight()}"><img src='assets/right-arrow.png' /></div>
+      <div *ngIf="!activeDomino" class='instruction'>Select Domino</div>
+      <div *ngIf="activeDomino && !canPlayRight() && !canPlayLeft()" class='play noplay'><img src='assets/no-play.png' /></div>
+      <div *ngIf="canPlayRight()" class='play' (click)="playRight()"><img src='assets/play-up.png' /></div>
+      <div class='border' *ngIf="game.board.center && canPlayLeft() && canPlayRight()"></div>
+      <div *ngIf="canPlayLeft() && game.board.center" class='play' (click)="playLeft()"><img src='assets/play-down.png' /></div>
     </div>
   </div>
   <div class='active-player'>
@@ -35,10 +38,10 @@
   <h1 *ngIf="game.status == 'Pending' && game.isMultiplayer()">Waiting for Players</h1>
   <h1 *ngIf="game.status == 'Intermission' || game.status == 'Completed'">{{game.isShut()?"Game Shut - ":""}}{{game.getActivePlayer().name}} Wins!</h1>
   <h1 *ngIf="game.status == 'Drawn'">Game Push</h1>
-  <div *ngIf="game.status == 'Pending' && game.isMultiplayer()">Game Code: {{game.code}}</div>
+  <div *ngIf="game.status == 'Pending' && game.isMultiplayer()" class="game-code">Game Code: {{game.code}}</div>
   <div *ngIf="(game.status == 'Drawn' || game.status == 'Intermission') && game.isMultiplayer()">Game will resume in {{timer}}</div>
   <div class='button-panel'>
-    <jn-button *ngIf="game.status == 'Pending' && !game.isMultiplayer()" (click)="game.start()" label="Start Now"></jn-button>
+    <jn-button *ngIf="game.status == 'Pending' && (!game.isMultiplayer() || viewPoint == 0)" (click)="game.start()" label="Start Now"></jn-button>
     <jn-button *ngIf="(game.status == 'Drawn' || game.status == 'Intermission') && !game.isMultiplayer()" (click)="game.start()" label="Continue"></jn-button>
     <jn-button *ngIf="game.status == 'Completed' || game.status == 'Victory'" (click)="mainMenu()" label="Main Menu"></jn-button>
   </div>

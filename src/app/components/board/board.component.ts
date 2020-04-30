@@ -1,5 +1,6 @@
 import { Component, Input, ViewChild, ElementRef } from '@angular/core';
 import { Board } from '../../model/board.model';
+import { Domino } from '../../model/domino.model';
 
 @Component({
   selector:"jn-board",
@@ -24,8 +25,7 @@ export class BoardComponent{
   }
 
   ngAfterViewInit(){
-    this._verticalCapacity = (window.innerHeight - 185)/2 - 25;
-    console.log(this._verticalCapacity);
+    this._verticalCapacity = (window.innerHeight - 145)/2 - 25;
   }
 
   reset(){
@@ -47,6 +47,10 @@ export class BoardComponent{
 
       if(height <= this._verticalCapacity){
         upDominos.push(currentDomino.next);
+      }else if(!currentDomino.next.isDouble() && height - 25 <= this._verticalCapacity){
+        this.upFull = true;
+        height -= 25;
+        upDominos.push(currentDomino.next);
       }else{
         this.upFull = true;
         break;
@@ -60,6 +64,23 @@ export class BoardComponent{
     }
 
     return upDominos;
+  }
+
+  getRemainingUpDominos(){
+    let remainingDominos = [];
+
+    let currentDomino = this.board.center;
+    while(currentDomino && currentDomino.next){
+      if(this.getUpDominos().indexOf(currentDomino.next) >= 0){
+        currentDomino = currentDomino.next;
+        continue;
+      }
+
+      remainingDominos.push(currentDomino.next);
+      currentDomino = currentDomino.next;
+    }
+
+    return remainingDominos;
   }
 
   getDownDominos(){
@@ -76,8 +97,12 @@ export class BoardComponent{
 
       if(height <= this._verticalCapacity){
         downDominos.push(currentDomino.previous);
+      }else if(!currentDomino.previous.isDouble() && height - 25 <= this._verticalCapacity){
+        this.downFull = true;
+        height -= 25;
+        downDominos.push(currentDomino.previous);
       }else{
-        this.upFull = true;
+        this.downFull = true;
         break;
       }
 
@@ -91,105 +116,38 @@ export class BoardComponent{
     return downDominos;
   }
 
-  /*
-
-  getUpDominos(){
-    let width = 0;
-    let upDominos = [];
+  getRemainingDownDominos(){
+    let remainingDominos = [];
 
     let currentDomino = this.board.center;
     while(currentDomino && currentDomino.previous){
-      if(this.getLeftDominos().indexOf(currentDomino.previous) >= 0){
+      if(this.getDownDominos().indexOf(currentDomino.previous) >= 0){
         currentDomino = currentDomino.previous;
         continue;
       }
 
-      upDominos.push(currentDomino.previous);
-      if(currentDomino.previous.isDouble()){
-        width += 25;
-      }else{
-        width += 50;
-      }
-
-      if(width > 150 && (currentDomino.previous.isDouble() || !currentDomino.isDouble())){
-        this.upFull = true;
-        break;
-      }
-
+      remainingDominos.push(currentDomino.previous);
       currentDomino = currentDomino.previous;
     }
 
-    if(this.canvas && this.up && this.down){
-      this.canvas.nativeElement.style.marginTop = (this.down.nativeElement.offsetHeight - this.up.nativeElement.offsetHeight)+"px";
-    }
-
-    return upDominos;
+    return remainingDominos;
   }
 
-  getDownDominos(){
-    let width = 0;
-    let downDominos = [];
-
-    let currentDomino = this.board.center;
-    while(currentDomino && currentDomino.next){
-      if(this.getRightDominos().indexOf(currentDomino.next) >= 0){
-        currentDomino = currentDomino.next;
-        continue;
-      }
-
-      downDominos.push(currentDomino.next);
-      if(currentDomino.next.isDouble()){
-        width += 25;
-      }else{
-        width += 50;
-      }
-
-      if(width > 150 && (currentDomino.next.isDouble() || !currentDomino.isDouble())){
-        this.downFull = true;
-        break;
-      }
-
-      currentDomino = currentDomino.next;
+  isUpDouble(index: number, domino: Domino){
+    if(this.upFull){
+      let upCount = this.getUpDominos().length;
+      return index == upCount - 1 || (domino.isDouble() && index !== upCount -2);
+    }else{
+      return domino.isDouble();
     }
-
-    if(this.canvas && this.up && this.down){
-      this.canvas.nativeElement.style.marginTop = (this.down.nativeElement.offsetHeight - this.up.nativeElement.offsetHeight)+"px";
-    }
-
-    return downDominos;
   }
 
-  getTopDominos(){
-    let topDominos = [];
-
-    let currentDomino = this.board.center;
-    while(currentDomino && currentDomino.previous){
-      if(this.getLeftDominos().indexOf(currentDomino.previous) >= 0 || this.getUpDominos().indexOf(currentDomino.previous) >= 0){
-        currentDomino = currentDomino.previous;
-        continue;
-      }
-
-      topDominos.push(currentDomino.previous);
-      currentDomino = currentDomino.previous;
+  isDownDouble(index: number, domino: Domino){
+    if(this.downFull){
+      let downCount = this.getDownDominos().length;
+      return index == downCount - 1 || (domino.isDouble() && index !== downCount -2);
+    }else{
+      return domino.isDouble();
     }
-
-    return topDominos;
   }
-
-  getBottomDominos(){
-    let bottomDominos = [];
-
-    let currentDomino = this.board.center;
-    while(currentDomino && currentDomino.next){
-      if(this.getRightDominos().indexOf(currentDomino.next) >= 0 || this.getDownDominos().indexOf(currentDomino.next) >= 0){
-        currentDomino = currentDomino.next;
-        continue;
-      }
-
-      bottomDominos.push(currentDomino.next);
-      currentDomino = currentDomino.next;
-    }
-
-    return bottomDominos;
-  }*/
 }

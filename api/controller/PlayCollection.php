@@ -24,11 +24,21 @@
         ResponseHandler::bad("You must specify a play to add.");
       }
 
-      if(!preg_match("/^[0-9],[0-9],(left|right|pass)$/",$play)){
+      if(!preg_match("/^[0-9],[0-9][0-9]?,(left|right|pass)$/",$play)){
         ResponseHandler::bad("Please specify your play in a valid format.");
       }
 
       $plays = $game->getPlays();
+
+      //Check domino has not already been played
+      $playParts = preg_split("/,/",$play);
+      foreach(preg_split("/;/",$plays) as $existingPlay){
+        $existingPlayParts = preg_split("/,/",$existingPlay);
+        if($playParts[0] == $existingPlayParts[0] && $playParts[1] == $existingPlayParts[1] && $playParts[2] == $existingPlayParts[2]){
+          ResponseHandler::conflict("This domino has already been played");
+        }
+      }
+
       $game->setPlays($plays.($plays?";":"")."$play");
 
       $sqlGateway = new SQLGateway();
