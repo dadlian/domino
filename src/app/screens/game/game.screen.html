@@ -41,7 +41,7 @@
   <div *ngIf="game.status == 'Pending' && game.isMultiplayer()" class="game-code">Game Code: {{game.code}}</div>
   <div *ngIf="(game.status == 'Drawn' || game.status == 'Intermission') && game.isMultiplayer()">Game will resume in {{timer}}</div>
   <div class='button-panel'>
-    <jn-button *ngIf="game.status == 'Pending' && (!game.isMultiplayer() || viewPoint == 0)" (click)="game.start()" label="Start Now"></jn-button>
+    <jn-button *ngIf="game.status == 'Pending' && (!game.isMultiplayer() || (viewPoint == 0 && game.seatsAvailable() < 3))" (click)="game.start()" label="Start Now"></jn-button>
     <jn-button *ngIf="(game.status == 'Drawn' || game.status == 'Intermission') && !game.isMultiplayer()" (click)="game.start()" label="Continue"></jn-button>
     <jn-button *ngIf="game.status == 'Completed' || game.status == 'Victory'" (click)="mainMenu()" label="Main Menu"></jn-button>
   </div>

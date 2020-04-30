@@ -79,7 +79,7 @@ export class Game{
     seed = seed % ais.length;
 
     for(let i = 0; i < 4; i++){
-      this.players.push(new Player({name: `${ais.splice(seed+4*i,1)[0]}`,role: (this.type == 'Push')?"Player":"Jailman"}));
+      this.players.push(new Player({name: `${ais.splice((seed+4*i)%ais.length,1)[0]}`,role: (this.type == 'Push')?"Player":"Jailman"}));
     }
   }
 
