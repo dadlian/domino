@@ -12,16 +12,18 @@ export class Game{
   public playTo: number;
   public players: Array<Player>;
   public board: Board;
+  public playClock: number;
+  public turn: number;
 
   private _deck: Array<Domino>;
   private _multiplayer: boolean;
   private _activePlayed: boolean;
   private _activePlayer: number;
   private _firstGame: boolean;
-  private _plays: number;
   private _statusChange: Subject<string>;
   private _playMade: Subject<{domino: Domino, position: string}>;
   private _auto: boolean;
+  private _timeout: number;
 
   constructor(gameData: any, private _gameService: GameService){
     //Initialise Public Variables
@@ -32,6 +34,8 @@ export class Game{
     this.players = [];
     this.deck = "";
     this.playTo = 6;
+    this.playClock = 0;
+    this.turn = 1;
 
     //Initialise active player
     let shield = gameData.shield;
@@ -54,10 +58,10 @@ export class Game{
     this._auto = true;
     this._multiplayer = false;
     this.board = new Board();
-    this._plays = 0;
     this._statusChange = new Subject<string>();
     this._playMade = new Subject<{domino: Domino, position: string}>();
     this._activePlayed = false;
+    this._timeout = 20;
 
     //Initialise deck
     if(this.deck.length == 0){
@@ -150,10 +154,6 @@ export class Game{
     return seatsAvailable;
   }
 
-  get turn(): number{
-    return Math.ceil((this._plays + 1) / this.players.length);
-  }
-
   start(){
     if(this.status == "Playing"){
       return false;
@@ -161,7 +161,7 @@ export class Game{
 
     this._activePlayed = false;
     this.board.center = null;
-    this._plays = 0;
+    this.turn = 1;
 
     if(!this._multiplayer){
       this._shuffle(5);
@@ -245,7 +245,7 @@ export class Game{
       return false;
     }
 
-    if(this._firstGame && this._plays == 0){
+    if(this._firstGame && this.turn == 1){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
       return !this._activePlayed && this.board.canPlayLeft(domino);
@@ -257,7 +257,7 @@ export class Game{
       return false;
     }
 
-    if(this._firstGame && this._plays == 0){
+    if(this._firstGame && this.turn == 1){
       return domino.value[0] == 6 && domino.value[1] == 6;
     }else{
       return !this._activePlayed && this.board.canPlayRight(domino);
@@ -286,7 +286,7 @@ export class Game{
       isShut = isShut && (this._getValidPlays(player) == 0);
     }
 
-    return isShut;
+    return this.getActivePlayer().hand.length > 0 && isShut;
   }
 
   isWatching(){
@@ -308,11 +308,15 @@ export class Game{
     }
 
     if(!this.getActivePlayer().human){
+      let turn = this.turn;
       setTimeout(() => {
-        this._aiTurn();
-      },1000)
+        console.log("Playing "+turn+" for AI")
+        this._aiTurn(turn);
+      },5000)
     }else if(this.getActivePlayer().remote){
-      this._gameService.getPlay();
+      this._runPlayClock(this.turn,this.activePlayer,this._timeout + 5);
+    }else{
+      this._runPlayClock(this.turn,this.activePlayer,this._timeout);
     }
   }
 
@@ -339,7 +343,7 @@ export class Game{
       }else{
         this._activePlayer = (this._activePlayer + 1) % this.players.length;
         this._activePlayed = false;
-        this._plays += 1;
+        this.turn += 1;
 
         this.waitForPlay();
       }
@@ -421,8 +425,13 @@ export class Game{
     }
   }
 
-  private _aiTurn(){
+  private _aiTurn(turn: number){
+    if(turn !== this.turn){
+      return false;
+    }
+
     let played: boolean = false;
+
     for(let domino of this.getActivePlayer().hand){
       if(this.playLeft(domino) || this.playRight(domino)){
         played = true;
@@ -432,6 +441,20 @@ export class Game{
 
     if(!played){
       this.pass();
+    }
+  }
+
+  private _runPlayClock(turn: number, activePlayer: number, timeLeft: number){
+    if(this.activePlayer !== activePlayer){
+      return;
+    }else if(timeLeft == 0){
+      console.log("Playing "+turn+" for expired clock")
+      this._aiTurn(turn);
+    }else{
+      this.playClock = timeLeft;
+      setTimeout(() => {
+        this._runPlayClock(turn, activePlayer, timeLeft - 1);
+      },1000)
     }
   }
 }

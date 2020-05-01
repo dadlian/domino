@@ -69,6 +69,7 @@ export class MenuScreen{
     this.joinModal.hide();
     this._gameService.loadGame(this.code).then(game => {
       if(game){
+        this._fullScreenService.openFullScreen();
         this._router.navigate(["/game"]);
       }else{
         this.errorModal.show();

@@ -60,7 +60,7 @@ export class BoardComponent{
     }
 
     if(this.canvas && this.up && this.down){
-      this.canvas.nativeElement.style.marginBottom = (this.up.nativeElement.offsetHeight - this.down.nativeElement.offsetHeight)+"px";
+      this.canvas.nativeElement.style.marginTop = (this.down.nativeElement.offsetHeight - this.up.nativeElement.offsetHeight)+"px";
     }
 
     return upDominos;
@@ -110,7 +110,7 @@ export class BoardComponent{
     }
 
     if(this.canvas && this.up && this.down){
-      this.canvas.nativeElement.style.marginBottom = (this.up.nativeElement.offsetHeight - this.down.nativeElement.offsetHeight)+"px";
+      this.canvas.nativeElement.style.marginTop = (this.down.nativeElement.offsetHeight - this.up.nativeElement.offsetHeight)+"px";
     }
 
     return downDominos;

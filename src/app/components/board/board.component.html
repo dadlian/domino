@@ -11,13 +11,13 @@
   </div>
   <div class='middle-column'>
     <div class='up' #up>
-      <jn-domino *ngFor="let domino of getUpDominos(); let i = index" [domino]="domino" [ngClass]="{double:isUpDouble(i,domino), inverted: domino.inverted}"></jn-domino>
+      <jn-domino *ngFor="let domino of getUpDominos(); let i = index" [domino]="domino" [ngClass]="{double:i > 0 && isUpDouble(i,domino), inverted: domino.inverted}"></jn-domino>
     </div>
     <div class='center'>
       <jn-domino *ngIf="board.center" [domino]="board.center"></jn-domino>
     </div>
     <div class='down' #down>
-      <jn-domino *ngFor="let domino of getDownDominos(); let i = index" [domino]="domino" [ngClass]="{double:isDownDouble(i,domino), inverted: domino.inverted}"></jn-domino>
+      <jn-domino *ngFor="let domino of getDownDominos(); let i = index" [domino]="domino" [ngClass]="{double:i > 0 && isDownDouble(i,domino), inverted: domino.inverted}"></jn-domino>
     </div>
   </div>
   <div class='right-connector-column'>

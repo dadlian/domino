@@ -11,13 +11,13 @@ export class GameService{
   private _root: string;
   private _currentGame: Game;
   private _activePlayers: any;
-  private _plays: Array<string>;
+  private _plays: any;
 
   constructor(private _httpClient: HttpClient){
     this._root = "https://dev.kycsar.com/domino/api";
     this._currentGame = null;
     this._activePlayers = {};
-    this._plays = [];
+    this._plays = {};
   }
 
   startSolo(type: string, playTo: number): boolean{
@@ -55,7 +55,7 @@ export class GameService{
   }
 
   loadGame(code: string): Promise<Game>{
-    let params = new HttpParams().set("code",code);
+    let params = new HttpParams().set("code",code.toUpperCase());
     return new Promise<Game>((resolve,reject)=>{
       this._httpClient.get(this._root+"/games",{params:params})
       .pipe(
@@ -103,7 +103,7 @@ export class GameService{
         .subscribe((player: any) => {
           this._currentGame.setPlayer(player, player.position);
           this._activePlayers[player.id] = player;
-          this._heartbeat(player.position);
+          //this._heartbeat(player.position);
 
           if(this._currentGame.status == "Pending"){
             this._waitForStart();
@@ -119,63 +119,6 @@ export class GameService{
     })
   }
 
-  getPlay(){
-    let gameUpdate = this._httpClient.get(this._root+this._currentGame.self+"/plays");
-    let poll = timer(0,2000).pipe(
-      concatMap(_ => gameUpdate),
-      map(response => response)
-    )
-
-    let subscription = poll.subscribe((response: any) => {
-      if(response.total > this._plays.length){
-        let newPlays = response.entries;
-        let success: boolean = true;
-        for(let i = this._plays.length; i < newPlays.length; i++){
-          let play = newPlays[i];
-
-          if(this._plays.indexOf(play) < 0){
-            this._plays.push(play)
-          }
-
-          let playParts = play.split(",");
-          let position = playParts[2];
-          let activeDomino = null;
-
-          //Get Domino to play
-          for(let domino of this._currentGame.getActivePlayer().hand){
-            if(domino.value[0] == playParts[0] && domino.value[1] == playParts[1]){
-              activeDomino = domino;
-            }
-          }
-
-          if(position == "pass"){
-            success = success && this._currentGame.pass(false);
-          }else if(position == "left"){
-            success = success && this._currentGame.playLeft(activeDomino,false)
-          }else if(position == "right"){
-            success = success && this._currentGame.playRight(activeDomino,false)
-          }
-        }
-
-        if(success){
-          subscription.unsubscribe();
-        }
-      }
-    })
-  }
-
-  private _heartbeat(index: number){
-    let player = this._currentGame.players[index];
-    let playerUpdate = this._httpClient.put(this._root+player.self,player);
-    let heartbeat = timer(5000,5000).pipe(
-      concatMap(_ => playerUpdate),
-      map(response => response)
-    )
-
-    heartbeat.subscribe(response => {
-    })
-  }
-
   private _createGame(game: any){
     game.deck = game.deck;
     this._currentGame = new Game(game,this);
@@ -183,7 +126,7 @@ export class GameService{
     //Listen for Status Changes
     this._currentGame.statusChanged().subscribe(status => {
       if(status == "Playing"){
-        this._plays = [];
+        this._plays = {};
       }
 
       this._saveGame().then(game => {
@@ -196,16 +139,15 @@ export class GameService{
     //Listen for plays
     this._currentGame.playMade().subscribe(play => {
       if(play.position == "pass"){
-        this._addPlay(this._currentGame.activePlayer+","+this._plays.length+",pass");
+        this._addPlay(this._currentGame.turn, "0,0,pass");
       }else{
-        this._addPlay(`${play.domino.value[0]},${play.domino.value[1]},${play.position}`);
+        this._addPlay(this._currentGame.turn,`${play.domino.value[0]},${play.domino.value[1]},${play.position}`);
       }
 
     })
 
     //Initialise Game
-    let params = new HttpParams().set("active","true");
-    this._httpClient.get(this._root+this._currentGame.self+"/players",{params: params}).subscribe((response: any) => {
+    this._httpClient.get(this._root+this._currentGame.self+"/players").subscribe((response: any) => {
       //Add Existing players
       let totalScore = 0;
       for(let player of response.entries){
@@ -223,6 +165,9 @@ export class GameService{
       //Listen for Player Updates
       this._updatePlayers();
 
+      //Listen for Play Updates
+      this._updatePlays();
+
       //If the game has started, load the plays so far
       if(game.status == "Playing"){
         this._currentGame.deal();
@@ -230,29 +175,29 @@ export class GameService{
         this._httpClient.get(this._root+this._currentGame.self+"/plays").subscribe((response: any) => {
           this._currentGame.auto = false;
           for(let i = 0; i < response.total; i++){
-            let play = response.entries[i];
+            let turn = response.entires[i].turn;
+            let play = response.entries[i].play;
 
-            if(this._plays.indexOf(play) < 0){
-              this._plays.push(play)
-            }
+            if(!this._plays[turn]){
+              this._plays[turn] = play;
 
-            let playParts = play.split(",");
-            let position = playParts[2];
-            let activeDomino = null;
+              let position = play[2];
+              let activeDomino = null;
 
-            //Get Domino to play
-            for(let domino of this._currentGame.getActivePlayer().hand){
-              if(domino.value[0] == playParts[0] && domino.value[1] == playParts[1]){
-                activeDomino = domino;
+              //Get Domino to play
+              for(let domino of this._currentGame.getActivePlayer().hand){
+                if(domino.value[0] == parseInt(play[0]) && domino.value[1] == parseInt(play[1])){
+                  activeDomino = domino;
+                }
               }
-            }
 
-            if(position == "pass"){
-              this._currentGame.pass(false);
-            }else if(position == "left"){
-              this._currentGame.playLeft(activeDomino,false)
-            }else if(position == "right"){
-              this._currentGame.playRight(activeDomino,false)
+              if(position == "pass"){
+                this._currentGame.pass(false);
+              }else if(position == "left"){
+                this._currentGame.playLeft(activeDomino,false)
+              }else if(position == "right"){
+                this._currentGame.playRight(activeDomino,false)
+              }
             }
           }
 
@@ -264,8 +209,7 @@ export class GameService{
   }
 
   private _updatePlayers(){
-    let params = new HttpParams().set("active","true");
-    let playerUpdate = this._httpClient.get(this._root+this._currentGame.self+"/players",{params: params});
+    let playerUpdate = this._httpClient.get(this._root+this._currentGame.self+"/players");
     let updatePlayers = timer(0,5000).pipe(
       concatMap(_ => playerUpdate),
       map(response => response)
@@ -291,6 +235,45 @@ export class GameService{
         if(activeIds.indexOf(savedPlayers[i]) < 0){
           this._currentGame.removePlayer(this._activePlayers[savedPlayers[i]].position);
           delete this._activePlayers[savedPlayers[i]];
+        }
+      }
+    })
+  }
+
+  private _updatePlays(){
+    let poll = timer(0,2500).pipe(
+      concatMap(_ => this._httpClient.get(this._root+this._currentGame.self+"/plays",{params: new HttpParams().set("turn",this._getNextTurn().toString())})),
+      map(response => response)
+    )
+
+    poll.subscribe((response: {turn: number, play: Array<string>}) => {
+      if(!this._plays[response.turn]){
+        let turn = response.turn;
+        let play = response.play;
+        if(turn > 0 && !this._plays[turn]){
+          let position = play[2];
+          let activeDomino = null;
+
+          //Get Domino to play
+          for(let domino of this._currentGame.getActivePlayer().hand){
+            if(domino.value[0] == parseInt(play[0]) && domino.value[1] == parseInt(play[1])){
+              activeDomino = domino;
+            }
+          }
+
+          console.log("Playing "+turn+" from server");
+          let success: boolean = true;
+          if(position == "pass"){
+            success = success && this._currentGame.pass(false);
+          }else if(position == "left"){
+            success = success && this._currentGame.playLeft(activeDomino,false)
+          }else if(position == "right"){
+            success = success && this._currentGame.playRight(activeDomino,false)
+          }
+
+          if(success){
+            this._addPlay(turn,play.join(","));
+          }
         }
       }
     })
@@ -329,10 +312,19 @@ export class GameService{
     })
   }
 
-  private _addPlay(play: string){
-    if(this._plays.indexOf(play) < 0){
-      this._plays.push(play)
-      this._httpClient.post(this._root+this._currentGame.self+"/plays",{play:play}).subscribe(result => {})
+  private _addPlay(turn: number, play: string){
+    if(!this._plays[turn]){
+      this._plays[turn] = play;
+      this._httpClient.post(this._root+this._currentGame.self+"/plays",{play:`${turn},${play}`}).subscribe(result => {})
     }
+  }
+
+  private _getNextTurn(){
+    let turns = [];
+    for(let turn of Object.keys(this._plays)){
+      turns.push(parseInt(turn));
+    }
+
+    return Math.max(...turns)+1;
   }
 }

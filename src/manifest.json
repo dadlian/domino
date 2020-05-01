@@ -1,0 +1,15 @@
+{
+  "short_name": "Domino Night",
+  "name": "Domino Night",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "25x50",
+      "type": "image/png"
+    }
+  ],
+  "scope": "/",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "portrait"
+}

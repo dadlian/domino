@@ -74,12 +74,14 @@ export class GameScreen{
 
   pass(){
     if(this.myTurn()){
+      console.log("Playing "+this.game.turn+" for human")
       this.game.pass();
     }
   }
 
   playLeft(){
     if(this.canPlayLeft()){
+      console.log("Playing "+this.game.turn+" for human")
       this.game.playLeft(this.activeDomino);
       this.activeDomino = null;
     }
@@ -87,6 +89,7 @@ export class GameScreen{
 
   playRight(){
     if(this.canPlayRight()){
+      console.log("Playing "+this.game.turn+" for human")
       this.game.playRight(this.activeDomino);
       this.activeDomino = null;
     }
@@ -106,7 +109,7 @@ export class GameScreen{
       }
 
       this.joinModal.hide();
-      if(!this.game.isMultiplayer() || this.game.seatsAvailable() > 0){
+      if(this.game.status !== "Playing"){
         this.statusModal.show();
       }
     })
@@ -129,7 +132,6 @@ export class GameScreen{
   }
 
   exit(){
-    console.log("Exit")
     this._fullScreenService.closeFullScreen();
     this._router.navigate(["/"]);
   }

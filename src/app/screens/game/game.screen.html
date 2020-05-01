@@ -4,6 +4,7 @@
   <jn-player [player]='game.players[(viewPoint+3) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 3) % 4]}" position="left"></jn-player>
   <jn-board [board]="game.board"></jn-board>
   <jn-player [player]='game.players[(viewPoint+1) % 4]' [ngClass]="{active:game.getActivePlayer() == game.players[(viewPoint + 1) % 4]}" position="right"></jn-player>
+  <div *ngIf="myTurn()" class='playClock'>{{game.playClock}}</div>
   <div *ngIf="!game.isWatching()" class='status-dial'>
     <div *ngIf="!myTurn()" class='status'>
       <span>Waiting for {{game.getActivePlayer()?.name}}</span>

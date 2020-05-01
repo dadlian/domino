@@ -75,9 +75,9 @@
       $takenSeats = [];
 
       foreach($players as $player){
-        if((time() - $player->getLastPing()) <= 10){
+        //if((time() - $player->getLastPing()) <= 10){
           $takenSeats[] = $player->getPosition();
-        }
+        //}
       }
 
       if(sizeof($takenSeats) == 4){
