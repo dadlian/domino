@@ -17,6 +17,7 @@
 
     .left-column{
       align-self:flex-end;
+      margin-right:12.5px;
 
       .left{
         width:50px;
@@ -26,6 +27,7 @@
         jn-domino{
           transform:rotate(90deg);
           margin:12px 0px;
+          margin-left:-12.5px;
         }
 
         jn-domino.double{
@@ -41,28 +43,13 @@
           transform:rotate(180deg);
           margin:0px;
         }
-      }
-    }
 
-    .left-connector-column{
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      width:50px;
-      height:100%;
-      align-self:flex-end;
-
-      .bottom{
-        width:50px;
-        height:25px;
-        display: flex;
-
-        jn-domino{
-          transform:rotate(0deg);
+        jn-domino.shifted{
+          margin-left:-12.5px;
         }
 
-        jn-domino.inverted{
-          transform:rotate(180deg);
+        jn-domino.double.shifted{
+          margin-left:-12.5px;
         }
       }
     }
@@ -95,6 +82,14 @@
         jn-domino.double.inverted{
           transform:rotate(180deg);
           margin:0px;
+        }
+
+        jn-domino.shifted{
+          margin-left:12.5px;
+        }
+
+        jn-domino.double.shifted{
+          margin-left:12.5px;
         }
       }
 
@@ -131,28 +126,13 @@
           transform:rotate(180deg);
           margin:0px;
         }
-      }
-    }
 
-    .right-connector-column{
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      width:50px;
-      height:100%;
-      align-self:flex-start;
-
-      .top{
-        width:50px;
-        height:25px;
-        display: flex;
-
-        jn-domino{
-          transform:rotate(0deg);
+        jn-domino.shifted{
+          margin-left:-12.5px;
         }
 
-        jn-domino.inverted{
-          transform:rotate(180deg);
+        jn-domino.double.shifted{
+          margin-left:-12.5px;
         }
       }
     }
@@ -160,6 +140,7 @@
     .right-column{
       align-self:flex-start;
       height:100%;
+      margin-left:12.5px;
 
       .right{
         width:50px;
@@ -169,6 +150,7 @@
         jn-domino{
           transform:rotate(90deg);
           margin:12px 0px;
+          margin-left:12.5px;
         }
 
         jn-domino.double{
@@ -183,6 +165,14 @@
         jn-domino.double.inverted{
           transform:rotate(180deg);
           margin:0px;
+        }
+
+        jn-domino.shifted{
+          margin-left:12.5px;
+        }
+
+        jn-domino.double.shifted{
+          margin-left:12.5px;
         }
       }
     }

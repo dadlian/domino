@@ -307,12 +307,16 @@ export class Game{
       return false;
     }
 
-    if(!this.getActivePlayer().human){
+    console.log(this.players)
+    if(this.canEndTurn()){
+      setTimeout(() => {
+        this.pass();
+      },2000)
+    }else if(!this.getActivePlayer().human){
       let turn = this.turn;
       setTimeout(() => {
-        console.log("Playing "+turn+" for AI")
         this._aiTurn(turn);
-      },5000)
+      },2000)
     }else if(this.getActivePlayer().remote){
       this._runPlayClock(this.turn,this.activePlayer,this._timeout + 5);
     }else{
@@ -438,17 +442,12 @@ export class Game{
         break;
       }
     }
-
-    if(!played){
-      this.pass();
-    }
   }
 
   private _runPlayClock(turn: number, activePlayer: number, timeLeft: number){
     if(this.activePlayer !== activePlayer){
       return;
     }else if(timeLeft == 0){
-      console.log("Playing "+turn+" for expired clock")
       this._aiTurn(turn);
     }else{
       this.playClock = timeLeft;

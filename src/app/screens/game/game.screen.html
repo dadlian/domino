@@ -9,7 +9,7 @@
     <div *ngIf="!myTurn()" class='status'>
       <span>Waiting for {{game.getActivePlayer()?.name}}</span>
     </div>
-    <div *ngIf="myTurn() && game.canEndTurn()" class='status active' (click)="pass()">
+    <div *ngIf="myTurn() && game.canEndTurn()" class='status active'>
       <img src='assets/knock.png' />
     </div>
     <div *ngIf="myTurn() && !game.canEndTurn()" class='status active'>

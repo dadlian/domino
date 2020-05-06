@@ -72,16 +72,8 @@ export class GameScreen{
     }
   }
 
-  pass(){
-    if(this.myTurn()){
-      console.log("Playing "+this.game.turn+" for human")
-      this.game.pass();
-    }
-  }
-
   playLeft(){
     if(this.canPlayLeft()){
-      console.log("Playing "+this.game.turn+" for human")
       this.game.playLeft(this.activeDomino);
       this.activeDomino = null;
     }
@@ -89,7 +81,6 @@ export class GameScreen{
 
   playRight(){
     if(this.canPlayRight()){
-      console.log("Playing "+this.game.turn+" for human")
       this.game.playRight(this.activeDomino);
       this.activeDomino = null;
     }

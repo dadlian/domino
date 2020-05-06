@@ -1,33 +1,23 @@
 <div class='jn-board' #canvas>
   <div class='left-column'>
     <div class='left' #left>
-      <jn-domino *ngFor="let domino of getRemainingDownDominos().slice(1); let i = index" [domino]="domino" [ngClass]="{double:(domino.isDouble() && i != 1) || i == 0, inverted: domino.inverted}"></jn-domino>
-    </div>
-  </div>
-  <div class='left-connector-column'>
-    <div class='bottom'>
-      <jn-domino *ngIf="getRemainingDownDominos().length > 0" [domino]="getRemainingDownDominos()[0]" [ngClass]="{inverted: getRemainingDownDominos()[0].inverted}"></jn-domino>
+      <jn-domino *ngFor="let domino of getRemainingDownDominos(); let i = index" [domino]="domino" [ngClass]="{double:(domino.isDouble() && i != 1) || i == 0, inverted: domino.inverted, shifted: domino.isDouble() && i > 1}"></jn-domino>
     </div>
   </div>
   <div class='middle-column'>
     <div class='up' #up>
-      <jn-domino *ngFor="let domino of getUpDominos(); let i = index" [domino]="domino" [ngClass]="{double:i > 0 && isUpDouble(i,domino), inverted: domino.inverted}"></jn-domino>
+      <jn-domino *ngFor="let domino of getUpDominos(); let i = index" [domino]="domino" [ngClass]="{double:i > 0 && isUpDouble(i,domino), inverted: domino.inverted, shifted: upFull && i == getUpDominos().length - 1}"></jn-domino>
     </div>
     <div class='center'>
       <jn-domino *ngIf="board.center" [domino]="board.center"></jn-domino>
     </div>
     <div class='down' #down>
-      <jn-domino *ngFor="let domino of getDownDominos(); let i = index" [domino]="domino" [ngClass]="{double:i > 0 && isDownDouble(i,domino), inverted: domino.inverted}"></jn-domino>
-    </div>
-  </div>
-  <div class='right-connector-column'>
-    <div class='top'>
-      <jn-domino *ngIf="getRemainingUpDominos().length > 0" [domino]="getRemainingUpDominos()[0]" [ngClass]="{inverted: getRemainingUpDominos()[0].inverted}"></jn-domino>
+      <jn-domino *ngFor="let domino of getDownDominos(); let i = index" [domino]="domino" [ngClass]="{double:i > 0 && isDownDouble(i,domino), inverted: domino.inverted, shifted: downFull && i == getDownDominos().length - 1}"></jn-domino>
     </div>
   </div>
   <div class='right-column'>
     <div class='right' #right>
-      <jn-domino *ngFor="let domino of getRemainingUpDominos().slice(1); let i = index" [domino]="domino" [ngClass]="{double:(domino.isDouble() && i != 1) || i == 0, inverted: domino.inverted}"></jn-domino>
+      <jn-domino *ngFor="let domino of getRemainingUpDominos(); let i = index" [domino]="domino" [ngClass]="{double:(domino.isDouble() && i != 1) || i == 0, inverted: domino.inverted, shifted: domino.isDouble() && i > 1}"></jn-domino>
     </div>
   </div>
 </div>

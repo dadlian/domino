@@ -88,7 +88,25 @@ export class GameService{
     return new Promise<number>((resolve,reject)=>{
       let seat: number = -1;
 
-      if(this._currentGame.isMultiplayer()){
+      //Check if player is already in game and connect this session if so
+      for(let i=0; i < this._currentGame.players.length; i++){
+        if(this._currentGame.players[i].name == player.name){
+          seat = i;
+          break;
+        }
+      }
+
+      if(seat >= 0){
+        this._currentGame.players[seat].human = true;
+        this._currentGame.players[seat].remote = false;
+        this._heartbeat(this._currentGame.players[seat]);
+
+        if(this._currentGame.status == "Pending"){
+          this._waitForStart();
+        }
+
+        resolve(seat);
+      }else if(this._currentGame.isMultiplayer()){
         let payload = {
           name: player.name,
           role: (this._currentGame.type == 'Push')?"Player":"Jailman",
@@ -103,7 +121,7 @@ export class GameService{
         .subscribe((player: any) => {
           this._currentGame.setPlayer(player, player.position);
           this._activePlayers[player.id] = player;
-          //this._heartbeat(player.position);
+          this._heartbeat(player);
 
           if(this._currentGame.status == "Pending"){
             this._waitForStart();
@@ -174,9 +192,8 @@ export class GameService{
 
         this._httpClient.get(this._root+this._currentGame.self+"/plays").subscribe((response: any) => {
           this._currentGame.auto = false;
-          for(let i = 0; i < response.total; i++){
-            let turn = response.entires[i].turn;
-            let play = response.entries[i].play;
+          for(let turn of Object.keys(response.entries)){
+            let play = response.entries[turn].play;
 
             if(!this._plays[turn]){
               this._plays[turn] = play;
@@ -240,6 +257,17 @@ export class GameService{
     })
   }
 
+  private _heartbeat(player: Player){
+    let playerUpdate = this._httpClient.put(this._root+player.self,player);
+    let heartbeat = timer(10000,10000).pipe(
+      concatMap(_ => playerUpdate),
+      map(response => response)
+    )
+
+    heartbeat.subscribe(response => {
+    })
+  }
+
   private _updatePlays(){
     let poll = timer(0,2500).pipe(
       concatMap(_ => this._httpClient.get(this._root+this._currentGame.self+"/plays",{params: new HttpParams().set("turn",this._getNextTurn().toString())})),
@@ -261,7 +289,6 @@ export class GameService{
             }
           }
 
-          console.log("Playing "+turn+" from server");
           let success: boolean = true;
           if(position == "pass"){
             success = success && this._currentGame.pass(false);
@@ -325,6 +352,6 @@ export class GameService{
       turns.push(parseInt(turn));
     }
 
-    return Math.max(...turns)+1;
+    return (turns.length > 0)?Math.max(...turns)+1:1;
   }
 }
